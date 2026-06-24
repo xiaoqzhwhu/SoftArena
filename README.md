@@ -123,3 +123,35 @@ python3 -m softarena tool call \
   --tool cli-db/sqlite3/sqlite_query \
   --args "{\"db_path\":\"$tmpdb\",\"sql\":\"SELECT x FROM t\"}"
 ```
+
+### Docker JSON-RPC Backend
+
+For real Toolize containers, switch the runtime backend to `toolize_docker`:
+
+```bash
+python3 -m softarena tool call \
+  --runtime toolize_docker \
+  --tool cli-db/sqlite3/sqlite_query \
+  --args '{"db_path":"/workspace/test.db","sql":"SELECT 1 AS x"}'
+
+python3 -m softarena rollout batch \
+  --job configs/rollout/sqlite_smoke.json \
+  --runtime toolize_docker
+```
+
+The Docker backend sends JSON-RPC 2.0 over stdin/stdout to:
+
+```bash
+docker run --rm -i mass-toolize/<package>
+```
+
+By default images resolve as `mass-toolize/<package>`. Override the prefix with:
+
+```bash
+export SOFTARENA_TOOLIZE_IMAGE_PREFIX=your-registry/mass-toolize
+```
+
+Episode workspaces are mounted into containers at `/workspace`, and absolute host
+paths under the episode workspace are rewritten to container paths before calling
+Toolize. The backend is intentionally per-call for the MVP; a warm container or
+UDS backend can implement the same `runtime.call(tool_id, arguments)` interface.

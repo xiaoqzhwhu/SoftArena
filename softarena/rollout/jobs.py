@@ -20,6 +20,7 @@ class RolloutJob:
     seed_start: int
     max_tasks: int | None
     output_dir: Path
+    runtime: str = "local"
 
     @classmethod
     def from_json(cls, path: Path) -> "RolloutJob":
@@ -33,6 +34,7 @@ class RolloutJob:
             seed_start=int(data.get("seed_start", 0)),
             max_tasks=data.get("max_tasks"),
             output_dir=Path(data.get("output_dir", "runs/rollouts")),
+            runtime=data.get("runtime", "local"),
         )
 
 
@@ -59,6 +61,7 @@ def run_rollout_job(job: RolloutJob) -> dict[str, Any]:
                 split=job.split,
                 seed=job.seed_start + offset,
                 policy=job.policy,
+                runtime_backend=job.runtime,
             )
             trajectories.append(trajectory)
             jsonl.write(json.dumps(trajectory, ensure_ascii=False) + "\n")
@@ -70,6 +73,7 @@ def run_rollout_job(job: RolloutJob) -> dict[str, Any]:
         "split": job.split,
         "model": job.model,
         "policy": job.policy,
+        "runtime": job.runtime,
         "started_at": started_at,
         "finished_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "episodes": len(trajectories),

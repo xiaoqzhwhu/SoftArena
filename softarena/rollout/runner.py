@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Any
 
 from softarena.registry.envs import EnvSpec, load_entrypoint
-from softarena.runtime.toolize import LocalToolizeRuntime
+from softarena.runtime.base import ToolRuntime
+from softarena.runtime.factory import create_runtime
 
 
 def load_tasks(env: EnvSpec, split: str) -> list[dict[str, Any]]:
@@ -31,6 +32,7 @@ def run_episode(
     split: str = "smoke",
     seed: int = 0,
     policy: str = "scripted_sqlite",
+    runtime_backend: str = "local",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     init_fn = load_entrypoint(env, env.entrypoint["init"])
@@ -40,7 +42,8 @@ def run_episode(
         workspace = Path(tmp)
         episode = init_fn(task, workspace)
         start_time = time.time()
-        steps = run_scripted_policy(policy, env.env_id, episode)
+        runtime = create_runtime(runtime_backend, workspace=workspace)
+        steps = run_scripted_policy(policy, env.env_id, episode, runtime)
         verifier = verify_fn(episode)
         elapsed_ms = int((time.time() - start_time) * 1000)
         final_answer = "Created customer_revenue and idx_customer_revenue_customer_id."
@@ -53,7 +56,7 @@ def run_episode(
             "split": split,
             "seed": seed,
             "difficulty": task.get("difficulty", "unknown"),
-            "model": {"name": model, "kind": "scripted", "policy": policy},
+            "model": {"name": model, "kind": "scripted", "policy": policy, "runtime": runtime_backend},
             "prompt": episode["prompt"],
             "messages": build_training_messages(episode["prompt"], steps, final_answer),
             "steps": steps,
@@ -67,7 +70,7 @@ def run_episode(
         return trajectory
 
 
-def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any]) -> list[dict[str, Any]]:
+def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     if policy == "auto":
         policy = {
             "software_engineering.sqlite_data_repair.v1": "scripted_sqlite",
@@ -87,14 +90,14 @@ def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any]) -> li
     }
     if policy not in policies:
         raise ValueError(f"Unsupported policy: {policy}")
-    return policies[policy](episode, LocalToolizeRuntime())
+    return policies[policy](episode, runtime)
 
 
 def make_step(index: int, name: str, arguments: dict[str, Any], rationale: str, observation: dict[str, Any]) -> dict[str, Any]:
     return {"index": index, "rationale": rationale, "tool_call": {"name": name, "arguments": arguments}, "observation": observation, "latency_ms": 0}
 
 
-def scripted_archive_forensics_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_archive_forensics_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     archive_path = Path(episode["archive_path"])
     extract_dir = Path(episode["extract_dir"]); extract_dir.mkdir(parents=True, exist_ok=True)
     steps = []
@@ -113,7 +116,7 @@ def scripted_archive_forensics_policy(episode: dict[str, Any], runtime: LocalToo
     return steps
 
 
-def scripted_text_transform_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_text_transform_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     input_path = Path(episode["input_path"]); output_path = Path(episode["output_path"])
     with input_path.open() as f:
         rows = list(csv.DictReader(f))
@@ -126,7 +129,7 @@ def scripted_text_transform_policy(episode: dict[str, Any], runtime: LocalTooliz
     ]
 
 
-def scripted_build_fix_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_build_fix_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     project = Path(episode["project_dir"]); source = Path(episode["source_path"])
     before_obs = runtime.call("devel/make/make", {"cwd": str(project), "target": "test"})
     source.write_text(source.read_text().replace("return a - b;", "return a + b;"))
@@ -138,7 +141,7 @@ def scripted_build_fix_policy(episode: dict[str, Any], runtime: LocalToolizeRunt
     ]
 
 
-def scripted_dns_debug_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_dns_debug_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     evidence = json.loads(Path(episode["evidence_path"]).read_text())
     report = {"root_cause": "stale_dns_record", "remediation": f"update {evidence['domain']} A record to {evidence['http_connect_ip']}"}
     Path(episode["report_path"]).write_text(json.dumps(report, indent=2) + "\n")
@@ -149,7 +152,7 @@ def scripted_dns_debug_policy(episode: dict[str, Any], runtime: LocalToolizeRunt
     ]
 
 
-def scripted_accounting_reconcile_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_accounting_reconcile_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     sql = """
     DROP TABLE IF EXISTS reconciliation_report;
     CREATE TABLE reconciliation_report AS
@@ -171,7 +174,7 @@ def scripted_accounting_reconcile_policy(episode: dict[str, Any], runtime: Local
     ]
 
 
-def scripted_sqlite_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
+def scripted_sqlite_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     db_path = episode["db_path"]
     actions = [
         {

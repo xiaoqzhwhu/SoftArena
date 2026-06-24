@@ -10,7 +10,7 @@ from softarena.rollout.jobs import RolloutJob, run_rollout_job
 from softarena.rollout.runner import load_tasks, run_episode
 from softarena.training.datasets import build_reward_dataset, build_sft_dataset
 from softarena.training.trainer import TrainingRecipe, list_training_runs, run_training_recipe
-from softarena.runtime.toolize import LocalToolizeRuntime
+from softarena.runtime.factory import create_runtime
 from softarena.doctor import run_doctor
 
 
@@ -27,6 +27,8 @@ def main() -> None:
     tool_call_parser = tool_subparsers.add_parser("call")
     tool_call_parser.add_argument("--tool", required=True)
     tool_call_parser.add_argument("--args", default="{}")
+    tool_call_parser.add_argument("--runtime", default="local", choices=["local", "local_toolize", "docker", "toolize_docker"])
+    tool_call_parser.add_argument("--workspace")
 
     env_parser = subparsers.add_parser("env")
     env_subparsers = env_parser.add_subparsers(dest="env_command", required=True)
@@ -41,8 +43,10 @@ def main() -> None:
     run_parser.add_argument("--output-dir", default="runs/smoke")
     run_parser.add_argument("--seed", type=int, default=0)
     run_parser.add_argument("--policy", default="scripted_sqlite")
+    run_parser.add_argument("--runtime", default="local", choices=["local", "local_toolize", "docker", "toolize_docker"])
     batch_parser = rollout_subparsers.add_parser("batch")
     batch_parser.add_argument("--job", required=True)
+    batch_parser.add_argument("--runtime", choices=["local", "local_toolize", "docker", "toolize_docker"])
 
     dataset_parser = subparsers.add_parser("dataset")
     dataset_subparsers = dataset_parser.add_subparsers(dest="dataset_command", required=True)
@@ -73,7 +77,8 @@ def main() -> None:
 
     if args.command == "tool" and args.tool_command == "call":
         arguments = json.loads(args.args)
-        print(json.dumps(LocalToolizeRuntime().call(args.tool, arguments), indent=2, ensure_ascii=False))
+        workspace = Path(args.workspace) if args.workspace else None
+        print(json.dumps(create_runtime(args.runtime, workspace=workspace).call(args.tool, arguments), indent=2, ensure_ascii=False))
         return
 
     if args.command == "list-envs":
@@ -118,6 +123,7 @@ def main() -> None:
                 split=args.split,
                 seed=args.seed + index,
                 policy=args.policy,
+                runtime_backend=args.runtime,
             )
             for index, task in enumerate(tasks)
         ]
@@ -137,7 +143,20 @@ def main() -> None:
         return
 
     if args.command == "rollout" and args.rollout_command == "batch":
-        manifest = run_rollout_job(RolloutJob.from_json(Path(args.job)))
+        job = RolloutJob.from_json(Path(args.job))
+        if args.runtime:
+            job = RolloutJob(
+                job_id=job.job_id,
+                env_id=job.env_id,
+                split=job.split,
+                model=job.model,
+                policy=job.policy,
+                seed_start=job.seed_start,
+                max_tasks=job.max_tasks,
+                output_dir=job.output_dir,
+                runtime=args.runtime,
+            )
+        manifest = run_rollout_job(job)
         print(json.dumps(manifest, indent=2))
         return
 
