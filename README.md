@@ -101,17 +101,30 @@ Toolize `bin2mcp/...` tool id from the environment allowlist, or
 ## Agents' Last Exam
 
 Agents' Last Exam is an external benchmark, not the SoftArena smoke suite. Do
-not use `softarena_smoke_*` configs as an ALE substitute. The explicit entrypoint
-for the external benchmark is:
+not use `softarena_smoke_*` configs as an ALE substitute. Clone the official
+harness locally and point SoftArena at that checkout:
 
 ```bash
+git clone --depth 1 https://github.com/rdi-berkeley/agents-last-exam.git \
+  external/agents-last-exam
+
 python3 -m softarena eval agents-last-exam \
-  --model kimi-k2.7-code \
-  --dataset-dir /path/to/agents-last-exam
+  --model dummy \
+  --repo-dir external/agents-last-exam \
+  --dry-run
 ```
 
-If the official local task package or `manifest.json` is missing, the command
-writes a `blocked` report instead of running SoftArena environments.
+The adapter calls the official command:
+
+```bash
+uv run python -m ale_run run local_dummy_docker_exp.yaml [--dry-run]
+```
+
+The default generated experiment uses the official `dummy` agent, Docker Linux
+environment, and `selected_tasks/helloworld.txt`. A real run requires Docker and
+ALE task data access as described by the upstream repo. If Docker, task data, or
+cloud credentials are missing, SoftArena writes a `blocked` ALE report with the
+official stdout/stderr instead of running internal environments.
 
 ## Local Smoke Test
 

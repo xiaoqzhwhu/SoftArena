@@ -12,3 +12,6 @@ toolize/
 models/
 .tmp_video_frames/
 .tmp_video_frames_jpg/
+
+# External benchmark checkouts are local dependencies, not vendored source.
+external/

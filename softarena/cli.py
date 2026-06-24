@@ -13,7 +13,7 @@ from softarena.training.trainer import TrainingRecipe, list_training_runs, run_t
 from softarena.runtime.factory import create_runtime
 from softarena.doctor import run_doctor
 from softarena.evaluation.runner import EvalJob, run_eval_job
-from softarena.evaluation.agents_last_exam import run_agents_last_exam_probe
+from softarena.evaluation.agents_last_exam import run_agents_last_exam
 
 
 def main() -> None:
@@ -69,9 +69,12 @@ def main() -> None:
     eval_report_parser = eval_subparsers.add_parser("report")
     eval_report_parser.add_argument("--run-dir", required=True)
     ale_parser = eval_subparsers.add_parser("agents-last-exam")
-    ale_parser.add_argument("--model", required=True)
-    ale_parser.add_argument("--dataset-dir")
+    ale_parser.add_argument("--model", default="dummy")
+    ale_parser.add_argument("--repo-dir", default="external/agents-last-exam")
+    ale_parser.add_argument("--experiment")
+    ale_parser.add_argument("--dry-run", action="store_true")
     ale_parser.add_argument("--output-dir", default="runs/eval")
+    ale_parser.add_argument("--timeout-s", type=int, default=3600)
 
     train_parser = subparsers.add_parser("train")
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
@@ -210,10 +213,13 @@ def main() -> None:
         return
 
     if args.command == "eval" and args.eval_command == "agents-last-exam":
-        report = run_agents_last_exam_probe(
+        report = run_agents_last_exam(
             model=args.model,
-            dataset_dir=Path(args.dataset_dir) if args.dataset_dir else None,
+            repo_dir=Path(args.repo_dir),
+            experiment=Path(args.experiment) if args.experiment else None,
+            dry_run=args.dry_run,
             output_dir=Path(args.output_dir),
+            timeout_s=args.timeout_s,
         )
         print(json.dumps(report, indent=2, ensure_ascii=False))
         return
