@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from softarena.registry.envs import EnvSpec, load_entrypoint
-from softarena.runtime.sqlite_tools import call_sqlite_tool
+from softarena.runtime.toolize import LocalToolizeRuntime
 
 
 def load_tasks(env: EnvSpec, split: str) -> list[dict[str, Any]]:
@@ -87,31 +87,33 @@ def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any]) -> li
     }
     if policy not in policies:
         raise ValueError(f"Unsupported policy: {policy}")
-    return policies[policy](episode)
+    return policies[policy](episode, LocalToolizeRuntime())
 
 
 def make_step(index: int, name: str, arguments: dict[str, Any], rationale: str, observation: dict[str, Any]) -> dict[str, Any]:
     return {"index": index, "rationale": rationale, "tool_call": {"name": name, "arguments": arguments}, "observation": observation, "latency_ms": 0}
 
 
-def scripted_archive_forensics_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_archive_forensics_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     archive_path = Path(episode["archive_path"])
     extract_dir = Path(episode["extract_dir"]); extract_dir.mkdir(parents=True, exist_ok=True)
     steps = []
-    with tarfile.open(archive_path, "r:gz") as tar:
-        members = tar.getnames(); tar.extractall(extract_dir)
-    steps.append(make_step(0, "tar_extract", {"archive_path": str(archive_path), "output_dir": str(extract_dir)}, "Extract the archive so files can be inspected.", {"ok": True, "members": members}))
+    extract_obs = runtime.call("utils/tar/tar_extract", {"archive_path": str(archive_path), "output_dir": str(extract_dir)})
+    members = extract_obs.get("content", {}).get("members", [])
+    steps.append(make_step(0, "utils/tar/tar_extract", {"archive_path": str(archive_path), "output_dir": str(extract_dir)}, "Extract the archive so files can be inspected.", extract_obs))
     evidence = extract_dir / members[0]
-    file_type = mimetypes.guess_type(evidence.name)[0] or "ASCII text"
-    digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
-    steps.append(make_step(1, "file_identify", {"path": str(evidence)}, "Identify the extracted evidence file type.", {"ok": True, "file_type": file_type}))
-    steps.append(make_step(2, "sha256sum", {"path": str(evidence)}, "Hash the evidence to make the report reproducible.", {"ok": True, "sha256": digest}))
-    Path(episode["report_path"]).write_text(json.dumps({"evidence_file": evidence.name, "sha256": digest, "file_type": "ASCII text"}, indent=2) + "\n")
+    file_obs = runtime.call("utils/file/file_identify", {"path": str(evidence)})
+    file_type = file_obs.get("content", {}).get("file_type", "unknown")
+    hash_obs = runtime.call("utils/coreutils/sha256sum", {"path": str(evidence)})
+    digest = hash_obs.get("content", {}).get("sha256", "")
+    steps.append(make_step(1, "utils/file/file_identify", {"path": str(evidence)}, "Identify the extracted evidence file type.", file_obs))
+    steps.append(make_step(2, "utils/coreutils/sha256sum", {"path": str(evidence)}, "Hash the evidence to make the report reproducible.", hash_obs))
+    Path(episode["report_path"]).write_text(json.dumps({"evidence_file": evidence.name, "sha256": digest, "file_type": file_type}, indent=2) + "\n")
     steps.append(make_step(3, "write_report", {"path": episode["report_path"]}, "Write the final forensic report.", {"ok": True}))
     return steps
 
 
-def scripted_text_transform_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_text_transform_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     input_path = Path(episode["input_path"]); output_path = Path(episode["output_path"])
     with input_path.open() as f:
         rows = list(csv.DictReader(f))
@@ -124,19 +126,19 @@ def scripted_text_transform_policy(episode: dict[str, Any]) -> list[dict[str, An
     ]
 
 
-def scripted_build_fix_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_build_fix_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     project = Path(episode["project_dir"]); source = Path(episode["source_path"])
-    before = subprocess.run(["make", "test"], cwd=project, text=True, capture_output=True, check=False, timeout=30)
+    before_obs = runtime.call("devel/make/make", {"cwd": str(project), "target": "test"})
     source.write_text(source.read_text().replace("return a - b;", "return a + b;"))
-    after = subprocess.run(["make", "test"], cwd=project, text=True, capture_output=True, check=False, timeout=30)
+    after_obs = runtime.call("devel/make/make", {"cwd": str(project), "target": "test"})
     return [
-        make_step(0, "make_test", {"cwd": str(project)}, "Run the hidden-equivalent build test to reproduce the failure.", {"ok": before.returncode == 0, "returncode": before.returncode, "stderr": before.stderr}),
+        make_step(0, "make_test", {"cwd": str(project)}, "Run the hidden-equivalent build test to reproduce the failure.", before_obs),
         make_step(1, "edit_source", {"path": str(source)}, "Fix the arithmetic bug in the source file.", {"ok": True}),
-        make_step(2, "make_test", {"cwd": str(project)}, "Run tests again after the source fix.", {"ok": after.returncode == 0, "returncode": after.returncode, "stdout": after.stdout, "stderr": after.stderr}),
+        make_step(2, "make_test", {"cwd": str(project)}, "Run tests again after the source fix.", after_obs),
     ]
 
 
-def scripted_dns_debug_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_dns_debug_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     evidence = json.loads(Path(episode["evidence_path"]).read_text())
     report = {"root_cause": "stale_dns_record", "remediation": f"update {evidence['domain']} A record to {evidence['http_connect_ip']}"}
     Path(episode["report_path"]).write_text(json.dumps(report, indent=2) + "\n")
@@ -147,7 +149,7 @@ def scripted_dns_debug_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def scripted_accounting_reconcile_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_accounting_reconcile_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     sql = """
     DROP TABLE IF EXISTS reconciliation_report;
     CREATE TABLE reconciliation_report AS
@@ -161,15 +163,15 @@ def scripted_accounting_reconcile_policy(episode: dict[str, Any]) -> list[dict[s
            CASE WHEN ROUND(COALESCE(l.ledger_total, 0.0) - COALESCE(b.bank_total, 0.0), 2) = 0 THEN 'balanced' ELSE 'mismatch' END AS status
     FROM accounts a LEFT JOIN l USING(account_id) LEFT JOIN b USING(account_id);
     """
-    obs = call_sqlite_tool("sqlite_exec", {"db_path": episode["db_path"], "sql": sql})
-    query = call_sqlite_tool("sqlite_query", {"db_path": episode["db_path"], "sql": "SELECT * FROM reconciliation_report ORDER BY account_id"})
+    obs = runtime.call("cli-db/sqlite3/sqlite_exec", {"db_path": episode["db_path"], "sql": sql})
+    query = runtime.call("cli-db/sqlite3/sqlite_query", {"db_path": episode["db_path"], "sql": "SELECT * FROM reconciliation_report ORDER BY account_id"})
     return [
         make_step(0, "sqlite_exec", {"db_path": episode["db_path"], "sql": sql}, "Aggregate ledger and bank totals into a reconciliation report.", obs),
         make_step(1, "sqlite_query", {"db_path": episode["db_path"], "sql": "SELECT * FROM reconciliation_report ORDER BY account_id"}, "Inspect the final reconciliation rows.", query),
     ]
 
 
-def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
+def scripted_sqlite_policy(episode: dict[str, Any], runtime: LocalToolizeRuntime) -> list[dict[str, Any]]:
     db_path = episode["db_path"]
     actions = [
         {
@@ -205,12 +207,13 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
     steps = []
     for index, action in enumerate(actions):
         started = time.time()
-        observation = call_sqlite_tool(action["name"], action["arguments"])
+        tool_id = f"cli-db/sqlite3/{action['name']}"
+        observation = runtime.call(tool_id, action["arguments"])
         steps.append(
             {
                 "index": index,
                 "rationale": action["rationale"],
-                "tool_call": action,
+                "tool_call": {"name": tool_id, "arguments": action["arguments"]},
                 "observation": observation,
                 "latency_ms": int((time.time() - started) * 1000),
             }

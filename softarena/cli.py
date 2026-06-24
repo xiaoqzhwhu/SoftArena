@@ -10,6 +10,7 @@ from softarena.rollout.jobs import RolloutJob, run_rollout_job
 from softarena.rollout.runner import load_tasks, run_episode
 from softarena.training.datasets import build_reward_dataset, build_sft_dataset
 from softarena.training.trainer import TrainingRecipe, list_training_runs, run_training_recipe
+from softarena.runtime.toolize import LocalToolizeRuntime
 from softarena.doctor import run_doctor
 
 
@@ -20,6 +21,12 @@ def main() -> None:
     subparsers.add_parser("list-tools")
     subparsers.add_parser("list-envs")
     subparsers.add_parser("doctor")
+
+    tool_parser = subparsers.add_parser("tool")
+    tool_subparsers = tool_parser.add_subparsers(dest="tool_command", required=True)
+    tool_call_parser = tool_subparsers.add_parser("call")
+    tool_call_parser.add_argument("--tool", required=True)
+    tool_call_parser.add_argument("--args", default="{}")
 
     env_parser = subparsers.add_parser("env")
     env_subparsers = env_parser.add_subparsers(dest="env_command", required=True)
@@ -62,6 +69,11 @@ def main() -> None:
 
     if args.command == "doctor":
         print(json.dumps(run_doctor(), indent=2))
+        return
+
+    if args.command == "tool" and args.tool_command == "call":
+        arguments = json.loads(args.args)
+        print(json.dumps(LocalToolizeRuntime().call(args.tool, arguments), indent=2, ensure_ascii=False))
         return
 
     if args.command == "list-envs":

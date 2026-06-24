@@ -102,3 +102,24 @@ Run all local smoke checks with:
 ```bash
 python3 -m softarena doctor
 ```
+
+## Toolize Runtime
+
+SoftArena now separates tool metadata from tool execution:
+
+- Tool metadata comes from `toolize/baseline/*/*/config.toml`.
+- `LocalToolizeRuntime` exposes a stable `runtime.call(tool_id, arguments)` interface.
+- Current local backend executes stable real binaries such as `sqlite3`, `tar`, `file`, `sha256`, and `make`.
+- Future Docker/MCP backends should implement the same runtime interface, so environments do not change.
+
+You can smoke-test the runtime directly:
+
+```bash
+tmpdb=$(mktemp /tmp/softarena_toolize.XXXX.db)
+python3 -m softarena tool call \
+  --tool cli-db/sqlite3/sqlite_exec \
+  --args "{\"db_path\":\"$tmpdb\",\"sql\":\"CREATE TABLE t(x INTEGER); INSERT INTO t VALUES (1);\"}"
+python3 -m softarena tool call \
+  --tool cli-db/sqlite3/sqlite_query \
+  --args "{\"db_path\":\"$tmpdb\",\"sql\":\"SELECT x FROM t\"}"
+```
