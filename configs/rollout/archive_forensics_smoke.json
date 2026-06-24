@@ -1,0 +1,10 @@
+{
+  "job_id": "archive_forensics_smoke_rollout_v1",
+  "env_id": "system_ops.archive_forensics.v1",
+  "split": "smoke",
+  "model": "scripted_archive_forensics-v0",
+  "policy": "scripted_archive_forensics",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

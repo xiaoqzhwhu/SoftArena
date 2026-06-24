@@ -1,0 +1,10 @@
+{
+  "job_id": "build_fix_smoke_rollout_v1",
+  "env_id": "software_engineering.build_fix.v1",
+  "split": "smoke",
+  "model": "scripted_build_fix-v0",
+  "policy": "scripted_build_fix",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

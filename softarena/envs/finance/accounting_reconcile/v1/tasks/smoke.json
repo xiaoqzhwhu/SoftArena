@@ -1,0 +1,49 @@
+{
+  "tasks": [
+    {
+      "task_id": "accounting_reconcile_smoke_001",
+      "difficulty": "easy",
+      "prompt": "Reconcile ledger and bank transactions in the SQLite database at {db_path}. Create reconciliation_report with fields account_id, ledger_total, bank_total, difference, status.",
+      "ledger": [
+        [
+          "cash",
+          100.0
+        ],
+        [
+          "cash",
+          50.0
+        ],
+        [
+          "receivable",
+          75.0
+        ]
+      ],
+      "bank": [
+        [
+          "cash",
+          150.0
+        ],
+        [
+          "receivable",
+          70.0
+        ]
+      ],
+      "expected": [
+        {
+          "account_id": "cash",
+          "ledger_total": 150.0,
+          "bank_total": 150.0,
+          "difference": 0.0,
+          "status": "balanced"
+        },
+        {
+          "account_id": "receivable",
+          "ledger_total": 75.0,
+          "bank_total": 70.0,
+          "difference": 5.0,
+          "status": "mismatch"
+        }
+      ]
+    }
+  ]
+}

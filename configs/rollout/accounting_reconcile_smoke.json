@@ -1,0 +1,10 @@
+{
+  "job_id": "accounting_reconcile_smoke_rollout_v1",
+  "env_id": "finance.accounting_reconcile.v1",
+  "split": "smoke",
+  "model": "scripted_accounting_reconcile-v0",
+  "policy": "scripted_accounting_reconcile",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

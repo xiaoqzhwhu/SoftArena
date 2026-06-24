@@ -1,0 +1,41 @@
+{
+  "tasks": [
+    {
+      "task_id": "text_transform_smoke_001",
+      "difficulty": "easy",
+      "prompt": "Clean the CSV at {input_path}. Keep rows with status=active, normalize email to lowercase, and write JSON lines to {output_path} with fields id, name, email.",
+      "rows": [
+        {
+          "id": "1",
+          "name": "Ada Lovelace",
+          "email": "ADA@EXAMPLE.COM",
+          "status": "active"
+        },
+        {
+          "id": "2",
+          "name": "Grace Hopper",
+          "email": "Grace@Example.COM",
+          "status": "inactive"
+        },
+        {
+          "id": "3",
+          "name": "Alan Turing",
+          "email": "ALAN@EXAMPLE.COM",
+          "status": "active"
+        }
+      ],
+      "expected": [
+        {
+          "id": "1",
+          "name": "Ada Lovelace",
+          "email": "ada@example.com"
+        },
+        {
+          "id": "3",
+          "name": "Alan Turing",
+          "email": "alan@example.com"
+        }
+      ]
+    }
+  ]
+}

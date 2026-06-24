@@ -1,0 +1,12 @@
+{
+  "tasks": [
+    {
+      "task_id": "archive_forensics_smoke_001",
+      "difficulty": "easy",
+      "prompt": "Inspect the archive at {archive_path}. Extract it, identify the evidence file, and write a JSON report to {report_path} with fields evidence_file, sha256, and file_type.",
+      "evidence_name": "evidence.txt",
+      "evidence_content": "SoftArena archive evidence\ncase=smoke\n",
+      "expected_type": "ASCII text"
+    }
+  ]
+}

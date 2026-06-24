@@ -1,0 +1,10 @@
+{
+  "job_id": "text_transform_smoke_rollout_v1",
+  "env_id": "office.text_transform.v1",
+  "split": "smoke",
+  "model": "scripted_text_transform-v0",
+  "policy": "scripted_text_transform",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

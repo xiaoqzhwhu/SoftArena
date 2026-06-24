@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "task_id": "dns_debug_smoke_001",
+      "difficulty": "easy",
+      "prompt": "Diagnose why service.internal.test fails. Use the mocked DNS and HTTP evidence in {evidence_path}. Write a report to {report_path} with root_cause and remediation.",
+      "evidence": {
+        "domain": "service.internal.test",
+        "dns_answer": "10.0.0.42",
+        "http_connect_ip": "10.0.0.24",
+        "tls_cn": "service.internal.test"
+      },
+      "expected": {
+        "root_cause": "stale_dns_record",
+        "remediation": "update service.internal.test A record to 10.0.0.24"
+      }
+    }
+  ]
+}

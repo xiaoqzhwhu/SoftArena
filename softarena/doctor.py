@@ -42,15 +42,22 @@ def run_doctor() -> dict[str, Any]:
     report["checks"]["registry"] = {
         "env_count": len(envs),
         "tool_count": len(tools),
+        "active_env_ids": [e.env_id for e in envs if e.status == "active"],
         "has_sqlite_env": any(e.env_id == "software_engineering.sqlite_data_repair.v1" for e in envs),
     }
 
-    rollout_manifest = run_rollout_job(RolloutJob.from_json(Path("configs/rollout/sqlite_smoke.json")))
-    report["checks"]["rollout"] = rollout_manifest
-    if rollout_manifest["passed"] != rollout_manifest["episodes"]:
+    rollout_manifests = []
+    for job_path in sorted(Path("configs/rollout").glob("*_smoke.json")):
+        rollout_manifests.append(run_rollout_job(RolloutJob.from_json(job_path)))
+    report["checks"]["rollout"] = {
+        "jobs": rollout_manifests,
+        "episodes": sum(item["episodes"] for item in rollout_manifests),
+        "passed": sum(item["passed"] for item in rollout_manifests),
+    }
+    if report["checks"]["rollout"]["passed"] != report["checks"]["rollout"]["episodes"]:
         raise DoctorError(json.dumps(report, indent=2))
 
-    trajectories = Path(rollout_manifest["trajectories_jsonl"])
+    trajectories = Path("runs/rollouts")
     sft_manifest = build_sft_dataset(
         input_dir=trajectories,
         output_path=Path("datasets/sft/sqlite_smoke.jsonl"),

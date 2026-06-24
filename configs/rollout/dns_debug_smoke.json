@@ -1,0 +1,10 @@
+{
+  "job_id": "dns_debug_smoke_rollout_v1",
+  "env_id": "network.dns_debug.v1",
+  "split": "smoke",
+  "model": "scripted_dns_debug-v0",
+  "policy": "scripted_dns_debug",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

@@ -83,3 +83,22 @@ python3 -m softarena doctor
 It compiles Python sources, discovers registries, runs the SQLite rollout, builds
 SFT/reward datasets, runs the dry-run trainer, and prepares verl SFT/GRPO launchers.
 The latest report is written to `runs/doctor/latest.json`.
+
+## MVP Environments
+
+SoftArena currently includes six smoke-tested MVP environments:
+
+| Environment | Capability | Verifier |
+| --- | --- | --- |
+| `software_engineering.sqlite_data_repair.v1` | SQLite data repair | schema + SQL result |
+| `system_ops.archive_forensics.v1` | archive/file forensics | hash + metadata |
+| `office.text_transform.v1` | text/CSV cleanup | semantic JSONL diff |
+| `software_engineering.build_fix.v1` | C build debugging | `make test` hidden check |
+| `network.dns_debug.v1` | mocked DNS diagnosis | root cause + remediation report |
+| `finance.accounting_reconcile.v1` | accounting reconciliation | balance table check |
+
+Run all local smoke checks with:
+
+```bash
+python3 -m softarena doctor
+```

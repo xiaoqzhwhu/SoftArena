@@ -1,0 +1,9 @@
+{
+  "tasks": [
+    {
+      "task_id": "build_fix_smoke_001",
+      "difficulty": "easy",
+      "prompt": "The C project at {project_dir} fails to build. Fix the source so `make test` succeeds. Do not change the Makefile target names."
+    }
+  ]
+}
