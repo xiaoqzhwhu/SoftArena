@@ -105,12 +105,12 @@ def scripted_archive_forensics_policy(episode: dict[str, Any], runtime: ToolRunt
     members = extract_obs.get("content", {}).get("members", [])
     steps.append(make_step(0, "utils/tar/tar_extract", {"archive_path": str(archive_path), "output_dir": str(extract_dir)}, "Extract the archive so files can be inspected.", extract_obs))
     evidence = extract_dir / members[0]
-    file_obs = runtime.call("utils/file/file_identify", {"path": str(evidence)})
+    file_obs = runtime.call("utils/file/file_detect", {"path": str(evidence)})
     file_type = file_obs.get("content", {}).get("file_type", "unknown")
-    hash_obs = runtime.call("utils/coreutils/sha256sum", {"path": str(evidence)})
-    digest = hash_obs.get("content", {}).get("sha256", "")
-    steps.append(make_step(1, "utils/file/file_identify", {"path": str(evidence)}, "Identify the extracted evidence file type.", file_obs))
-    steps.append(make_step(2, "utils/coreutils/sha256sum", {"path": str(evidence)}, "Hash the evidence to make the report reproducible.", hash_obs))
+    hash_obs = runtime.call("utils/openssl/openssl_hash", {"data": evidence.read_text(), "algorithm": "sha256"})
+    digest = hash_obs.get("content", {}).get("hash", "")
+    steps.append(make_step(1, "utils/file/file_detect", {"path": str(evidence)}, "Identify the extracted evidence file type.", file_obs))
+    steps.append(make_step(2, "utils/openssl/openssl_hash", {"data": evidence.read_text(), "algorithm": "sha256"}, "Hash the evidence to make the report reproducible.", hash_obs))
     Path(episode["report_path"]).write_text(json.dumps({"evidence_file": evidence.name, "sha256": digest, "file_type": file_type}, indent=2) + "\n")
     steps.append(make_step(3, "write_report", {"path": episode["report_path"]}, "Write the final forensic report.", {"ok": True}))
     return steps
@@ -131,9 +131,9 @@ def scripted_text_transform_policy(episode: dict[str, Any], runtime: ToolRuntime
 
 def scripted_build_fix_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
     project = Path(episode["project_dir"]); source = Path(episode["source_path"])
-    before_obs = runtime.call("devel/make/make", {"cwd": str(project), "target": "test"})
+    before_obs = runtime.call("devel/make/make_check", {"cwd": str(project), "target": "test"})
     source.write_text(source.read_text().replace("return a - b;", "return a + b;"))
-    after_obs = runtime.call("devel/make/make", {"cwd": str(project), "target": "test"})
+    after_obs = runtime.call("devel/make/make_check", {"cwd": str(project), "target": "test"})
     return [
         make_step(0, "make_test", {"cwd": str(project)}, "Run the hidden-equivalent build test to reproduce the failure.", before_obs),
         make_step(1, "edit_source", {"path": str(source)}, "Fix the arithmetic bug in the source file.", {"ok": True}),

@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from softarena.registry.envs import discover_envs
+from softarena.registry.envs import discover_envs, validate_env_tools
 from softarena.registry.tools import scan_toolize_tools
 from softarena.rollout.jobs import RolloutJob, run_rollout_job
 from softarena.training.datasets import build_reward_dataset, build_sft_dataset
@@ -39,12 +39,16 @@ def run_doctor() -> dict[str, Any]:
 
     envs = discover_envs()
     tools = scan_toolize_tools()
+    tool_validation = validate_env_tools()
     report["checks"]["registry"] = {
         "env_count": len(envs),
         "tool_count": len(tools),
         "active_env_ids": [e.env_id for e in envs if e.status == "active"],
         "has_sqlite_env": any(e.env_id == "software_engineering.sqlite_data_repair.v1" for e in envs),
+        "tool_validation": tool_validation,
     }
+    if not tool_validation["passed"]:
+        raise DoctorError(json.dumps(report, indent=2))
 
     rollout_manifests = []
     for job_path in sorted(Path("configs/rollout").glob("*_smoke.json")):

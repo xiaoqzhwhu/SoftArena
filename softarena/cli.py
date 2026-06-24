@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-from softarena.registry.envs import discover_envs, find_env, write_env_index
+from softarena.registry.envs import discover_envs, find_env, validate_env_tools, write_env_index
 from softarena.registry.tools import scan_toolize_tools, write_tool_index
 from softarena.rollout.jobs import RolloutJob, run_rollout_job
 from softarena.rollout.runner import load_tasks, run_episode
@@ -33,6 +33,7 @@ def main() -> None:
     env_parser = subparsers.add_parser("env")
     env_subparsers = env_parser.add_subparsers(dest="env_command", required=True)
     env_subparsers.add_parser("discover")
+    env_subparsers.add_parser("validate-tools")
 
     rollout_parser = subparsers.add_parser("rollout")
     rollout_subparsers = rollout_parser.add_subparsers(dest="rollout_command", required=True)
@@ -108,6 +109,13 @@ def main() -> None:
         write_tool_index(Path("softarena/registry/tool_index.generated.json"))
         print("wrote softarena/registry/env_index.generated.json")
         print("wrote softarena/registry/tool_index.generated.json")
+        return
+
+    if args.command == "env" and args.env_command == "validate-tools":
+        result = validate_env_tools()
+        print(json.dumps(result, indent=2))
+        if not result["passed"]:
+            raise SystemExit(1)
         return
 
     if args.command == "rollout" and args.rollout_command == "run":

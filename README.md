@@ -155,3 +155,15 @@ Episode workspaces are mounted into containers at `/workspace`, and absolute hos
 paths under the episode workspace are rewritten to container paths before calling
 Toolize. The backend is intentionally per-call for the MVP; a warm container or
 UDS backend can implement the same `runtime.call(tool_id, arguments)` interface.
+
+## Tool ID Validation
+
+Environment `tool_allowlist` entries must be real Toolize tool ids discovered
+from `toolize/baseline/*/*/config.toml`. Validate them with:
+
+```bash
+python3 -m softarena env validate-tools
+```
+
+`python3 -m softarena doctor` runs this validation before rollout, so fake or
+misspelled tool ids fail fast.

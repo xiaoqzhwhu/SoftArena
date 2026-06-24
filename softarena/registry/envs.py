@@ -84,3 +84,17 @@ def write_env_index(path: Path, root: Path | None = None) -> None:
             }
         )
     path.write_text(json.dumps({"envs": envs}, indent=2, ensure_ascii=False) + "\n")
+
+
+
+def validate_env_tools(root: Path | None = None) -> dict[str, Any]:
+    from softarena.registry.tools import scan_toolize_tools
+
+    tool_ids = {tool.tool_id for tool in scan_toolize_tools(root)}
+    envs = discover_envs(root)
+    invalid = []
+    for env in envs:
+        missing = [tool_id for tool_id in env.tool_allowlist if tool_id not in tool_ids]
+        if missing:
+            invalid.append({"env_id": env.env_id, "missing": missing})
+    return {"passed": not invalid, "env_count": len(envs), "invalid": invalid}

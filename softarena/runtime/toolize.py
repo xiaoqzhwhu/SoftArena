@@ -60,6 +60,8 @@ class LocalToolizeRuntime:
             return self._file_identify(arguments)
         if "sha" in tool_id or name in {"sha256sum", "shasum"}:
             return self._sha256(arguments)
+        if name == "openssl_hash":
+            return self._openssl_hash(arguments)
         if name in {"make", "make_test"} or "make" in tool_id:
             return self._make(arguments, spec.timeout_secs)
         if name in {"cc", "gcc", "clang"}:
@@ -105,6 +107,14 @@ class LocalToolizeRuntime:
         path = Path(arguments["path"])
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         return ToolObservation(ok=True, content={"sha256": digest}, stdout=f"{digest}  {path}\n")
+
+    def _openssl_hash(self, arguments: dict[str, Any]) -> ToolObservation:
+        algorithm = arguments.get("algorithm", "sha256")
+        data = arguments.get("data", "")
+        if algorithm != "sha256":
+            return ToolObservation(ok=False, stderr=f"unsupported local hash algorithm: {algorithm}", returncode=1)
+        digest = hashlib.sha256(data.encode()).hexdigest()
+        return ToolObservation(ok=True, content={"hash": digest, "algorithm": algorithm}, stdout=digest + "\n")
 
     def _make(self, arguments: dict[str, Any], timeout: int) -> ToolObservation:
         target = arguments.get("target", "test")
