@@ -1,5 +1,5 @@
 {
-  "suite_id": "ale_smoke",
+  "suite_id": "softarena_smoke",
   "provider": "openai",
   "model": "gpt-5.5",
   "split": "smoke",

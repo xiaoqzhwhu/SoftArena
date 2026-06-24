@@ -13,6 +13,7 @@ from softarena.training.trainer import TrainingRecipe, list_training_runs, run_t
 from softarena.runtime.factory import create_runtime
 from softarena.doctor import run_doctor
 from softarena.evaluation.runner import EvalJob, run_eval_job
+from softarena.evaluation.agents_last_exam import run_agents_last_exam_probe
 
 
 def main() -> None:
@@ -67,6 +68,10 @@ def main() -> None:
     eval_run_parser.add_argument("--runtime", choices=["local", "local_toolize", "docker", "toolize_docker"])
     eval_report_parser = eval_subparsers.add_parser("report")
     eval_report_parser.add_argument("--run-dir", required=True)
+    ale_parser = eval_subparsers.add_parser("agents-last-exam")
+    ale_parser.add_argument("--model", required=True)
+    ale_parser.add_argument("--dataset-dir")
+    ale_parser.add_argument("--output-dir", default="runs/eval")
 
     train_parser = subparsers.add_parser("train")
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
@@ -202,6 +207,15 @@ def main() -> None:
     if args.command == "eval" and args.eval_command == "report":
         report_path = Path(args.run_dir) / "report.json"
         print(report_path.read_text())
+        return
+
+    if args.command == "eval" and args.eval_command == "agents-last-exam":
+        report = run_agents_last_exam_probe(
+            model=args.model,
+            dataset_dir=Path(args.dataset_dir) if args.dataset_dir else None,
+            output_dir=Path(args.output_dir),
+        )
+        print(json.dumps(report, indent=2, ensure_ascii=False))
         return
 
     if args.command == "dataset" and args.dataset_command == "build":

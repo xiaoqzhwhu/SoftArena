@@ -72,19 +72,19 @@ Production GRPO should replace that hook with a verifier-backed reward that
 executes candidate tool trajectories in isolated SoftArena environments.
 
 
-## ALE Evaluation
+## SoftArena Smoke Evaluation
 
-Run the local ALE smoke suite with the deterministic scripted baseline:
+Run the local SoftArena smoke suite with the deterministic scripted baseline:
 
 ```bash
-python3 -m softarena eval run --suite configs/eval/ale_smoke_scripted.json
+python3 -m softarena eval run --suite configs/eval/softarena_smoke_scripted.json
 ```
 
 Run the same suite with an OpenAI model using the Responses API:
 
 ```bash
 export OPENAI_API_KEY=...
-python3 -m softarena eval run --suite configs/eval/ale_smoke_gpt55.json
+python3 -m softarena eval run --suite configs/eval/softarena_smoke_gpt55.json
 ```
 
 The eval runner writes `report.json`, `leaderboard.csv`, and `trajectories.jsonl`
@@ -96,6 +96,22 @@ The OpenAI eval path uses a JSON-action tool loop. At each step the model must
 return either `{"rationale": ..., "tool": ..., "arguments": ...}` using a
 Toolize `bin2mcp/...` tool id from the environment allowlist, or
 `{"final_answer": ...}` when complete.
+
+
+## Agents' Last Exam
+
+Agents' Last Exam is an external benchmark, not the SoftArena smoke suite. Do
+not use `softarena_smoke_*` configs as an ALE substitute. The explicit entrypoint
+for the external benchmark is:
+
+```bash
+python3 -m softarena eval agents-last-exam \
+  --model kimi-k2.7-code \
+  --dataset-dir /path/to/agents-last-exam
+```
+
+If the official local task package or `manifest.json` is missing, the command
+writes a `blocked` report instead of running SoftArena environments.
 
 ## Local Smoke Test
 

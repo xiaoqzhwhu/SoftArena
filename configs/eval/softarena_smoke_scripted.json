@@ -1,5 +1,5 @@
 {
-  "suite_id": "ale_smoke",
+  "suite_id": "softarena_smoke",
   "provider": "scripted",
   "model": "scripted-softarena-v0",
   "split": "smoke",
