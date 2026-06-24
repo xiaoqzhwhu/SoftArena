@@ -1,0 +1,10 @@
+{
+  "suite_id": "ale_smoke",
+  "provider": "scripted",
+  "model": "scripted-softarena-v0",
+  "split": "smoke",
+  "runtime": "local",
+  "max_tasks_per_env": 1,
+  "policy": "auto",
+  "output_dir": "runs/eval"
+}

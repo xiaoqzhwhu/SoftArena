@@ -12,6 +12,7 @@ from softarena.training.datasets import build_reward_dataset, build_sft_dataset
 from softarena.training.trainer import TrainingRecipe, list_training_runs, run_training_recipe
 from softarena.runtime.factory import create_runtime
 from softarena.doctor import run_doctor
+from softarena.evaluation.runner import EvalJob, run_eval_job
 
 
 def main() -> None:
@@ -56,6 +57,16 @@ def main() -> None:
     build_parser.add_argument("--output", required=True)
     build_parser.add_argument("--kind", choices=["sft", "reward"], default="sft")
     build_parser.add_argument("--include-failed", action="store_true")
+
+    eval_parser = subparsers.add_parser("eval")
+    eval_subparsers = eval_parser.add_subparsers(dest="eval_command", required=True)
+    eval_run_parser = eval_subparsers.add_parser("run")
+    eval_run_parser.add_argument("--suite", required=True)
+    eval_run_parser.add_argument("--provider", choices=["scripted", "openai"])
+    eval_run_parser.add_argument("--model")
+    eval_run_parser.add_argument("--runtime", choices=["local", "local_toolize", "docker", "toolize_docker"])
+    eval_report_parser = eval_subparsers.add_parser("report")
+    eval_report_parser.add_argument("--run-dir", required=True)
 
     train_parser = subparsers.add_parser("train")
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
@@ -166,6 +177,31 @@ def main() -> None:
             )
         manifest = run_rollout_job(job)
         print(json.dumps(manifest, indent=2))
+        return
+
+    if args.command == "eval" and args.eval_command == "run":
+        job = EvalJob.from_json(Path(args.suite))
+        if args.provider or args.model or args.runtime:
+            job = EvalJob(
+                suite_id=job.suite_id,
+                model=args.model or job.model,
+                provider=args.provider or job.provider,
+                split=job.split,
+                env_ids=job.env_ids,
+                output_dir=job.output_dir,
+                runtime=args.runtime or job.runtime,
+                max_tasks_per_env=job.max_tasks_per_env,
+                seed_start=job.seed_start,
+                policy=job.policy,
+                max_steps=job.max_steps,
+                temperature=job.temperature,
+            )
+        print(json.dumps(run_eval_job(job), indent=2, ensure_ascii=False))
+        return
+
+    if args.command == "eval" and args.eval_command == "report":
+        report_path = Path(args.run_dir) / "report.json"
+        print(report_path.read_text())
         return
 
     if args.command == "dataset" and args.dataset_command == "build":

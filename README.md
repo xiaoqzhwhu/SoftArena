@@ -71,6 +71,32 @@ The MVP GRPO adapter uses `softarena/training/verl_reward.py` as the reward hook
 Production GRPO should replace that hook with a verifier-backed reward that
 executes candidate tool trajectories in isolated SoftArena environments.
 
+
+## ALE Evaluation
+
+Run the local ALE smoke suite with the deterministic scripted baseline:
+
+```bash
+python3 -m softarena eval run --suite configs/eval/ale_smoke_scripted.json
+```
+
+Run the same suite with an OpenAI model using the Responses API:
+
+```bash
+export OPENAI_API_KEY=...
+python3 -m softarena eval run --suite configs/eval/ale_smoke_gpt55.json
+```
+
+The eval runner writes `report.json`, `leaderboard.csv`, and `trajectories.jsonl`
+under `runs/eval/<run_id>/`. A run with missing credentials or unavailable model
+is marked `blocked` with skipped episodes instead of being counted as a model
+score.
+
+The OpenAI eval path uses a JSON-action tool loop. At each step the model must
+return either `{"rationale": ..., "tool": ..., "arguments": ...}` using a
+Toolize `bin2mcp/...` tool id from the environment allowlist, or
+`{"final_answer": ...}` when complete.
+
 ## Local Smoke Test
 
 On macOS, use the doctor command to validate the local code path without running
