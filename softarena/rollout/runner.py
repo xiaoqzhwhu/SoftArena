@@ -30,6 +30,7 @@ def run_episode(env: EnvSpec, task: dict[str, Any], model: str, output_dir: Path
         steps = scripted_sqlite_policy(episode)
         verifier = verify_fn(episode)
         elapsed_ms = int((time.time() - start_time) * 1000)
+        final_answer = "Created customer_revenue and idx_customer_revenue_customer_id."
 
         trajectory = {
             "episode_id": f"{env.env_id}:{task['task_id']}:seed0",
@@ -40,8 +41,9 @@ def run_episode(env: EnvSpec, task: dict[str, Any], model: str, output_dir: Path
             "difficulty": task.get("difficulty", "unknown"),
             "model": {"name": model, "kind": "scripted"},
             "prompt": episode["prompt"],
+            "messages": build_training_messages(episode["prompt"], steps, final_answer),
             "steps": steps,
-            "final_answer": "Created customer_revenue and idx_customer_revenue_customer_id.",
+            "final_answer": final_answer,
             "verifier": verifier,
             "elapsed_ms": elapsed_ms,
         }
@@ -57,6 +59,7 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
         {
             "name": "sqlite_schema",
             "arguments": {"db_path": db_path},
+            "rationale": "Inspect the existing database schema before changing state.",
         },
         {
             "name": "sqlite_exec",
@@ -71,6 +74,7 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
                     "ON customer_revenue(customer_id);"
                 ),
             },
+            "rationale": "Materialize the requested paid-order aggregate and create the required lookup index.",
         },
         {
             "name": "sqlite_query",
@@ -78,6 +82,7 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
                 "db_path": db_path,
                 "sql": "SELECT customer_id, total_revenue FROM customer_revenue ORDER BY customer_id",
             },
+            "rationale": "Query the final table in deterministic order to verify the state before answering.",
         },
     ]
 
@@ -88,6 +93,7 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
         steps.append(
             {
                 "index": index,
+                "rationale": action["rationale"],
                 "tool_call": action,
                 "observation": observation,
                 "latency_ms": int((time.time() - started) * 1000),
@@ -96,3 +102,39 @@ def scripted_sqlite_policy(episode: dict[str, Any]) -> list[dict[str, Any]]:
         if not observation.get("ok"):
             break
     return steps
+
+
+def build_training_messages(prompt: str, steps: list[dict[str, Any]], final_answer: str) -> list[dict[str, Any]]:
+    messages: list[dict[str, Any]] = [
+        {
+            "role": "system",
+            "content": (
+                "You are a software agent operating in SoftArena. Use the available tools to update "
+                "the environment state. Provide concise, auditable rationales for tool choices."
+            ),
+        },
+        {"role": "user", "content": prompt},
+    ]
+    for step in steps:
+        call = step["tool_call"]
+        messages.append(
+            {
+                "role": "assistant",
+                "content": step["rationale"],
+                "tool_calls": [
+                    {
+                        "name": call["name"],
+                        "arguments": call["arguments"],
+                    }
+                ],
+            }
+        )
+        messages.append(
+            {
+                "role": "tool",
+                "name": call["name"],
+                "content": step["observation"],
+            }
+        )
+    messages.append({"role": "assistant", "content": final_answer})
+    return messages

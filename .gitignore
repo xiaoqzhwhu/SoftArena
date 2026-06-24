@@ -3,6 +3,7 @@ __pycache__/
 .DS_Store
 
 runs/
+datasets/
 softarena/registry/*_index.generated.json
 
 # Toolize is a large external tool corpus. Keep it outside the first

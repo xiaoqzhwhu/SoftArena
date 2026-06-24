@@ -7,6 +7,7 @@ from pathlib import Path
 from softarena.registry.envs import discover_envs, find_env, write_env_index
 from softarena.registry.tools import scan_toolize_tools, write_tool_index
 from softarena.rollout.runner import load_tasks, run_episode
+from softarena.training.datasets import build_sft_dataset
 
 
 def main() -> None:
@@ -27,6 +28,13 @@ def main() -> None:
     run_parser.add_argument("--split", default="smoke")
     run_parser.add_argument("--model", default="scripted-sqlite-v0")
     run_parser.add_argument("--output-dir", default="runs/smoke")
+
+    dataset_parser = subparsers.add_parser("dataset")
+    dataset_subparsers = dataset_parser.add_subparsers(dest="dataset_command", required=True)
+    build_parser = dataset_subparsers.add_parser("build")
+    build_parser.add_argument("--input-dir", required=True)
+    build_parser.add_argument("--output", required=True)
+    build_parser.add_argument("--include-failed", action="store_true")
 
     args = parser.parse_args()
 
@@ -82,6 +90,15 @@ def main() -> None:
                 indent=2,
             )
         )
+        return
+
+    if args.command == "dataset" and args.dataset_command == "build":
+        result = build_sft_dataset(
+            input_dir=Path(args.input_dir),
+            output_path=Path(args.output),
+            require_passed=not args.include_failed,
+        )
+        print(json.dumps(result, indent=2))
         return
 
 
