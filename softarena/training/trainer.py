@@ -34,11 +34,14 @@ class TrainingRecipe:
         )
 
 
-def run_training_recipe(recipe: TrainingRecipe) -> dict[str, Any]:
+def run_training_recipe(recipe: TrainingRecipe, execute: bool = False) -> dict[str, Any]:
+    if recipe.trainer == "verl":
+        from softarena.training.adapters.verl import run_verl_recipe
+
+        return run_verl_recipe(recipe, execute=execute)
     if recipe.trainer != "dry_run":
         raise ValueError(
-            f"Unsupported trainer {recipe.trainer!r}. The MVP includes dry_run; "
-            "wire real trainers behind this same interface."
+            f"Unsupported trainer {recipe.trainer!r}. Supported trainers: dry_run, verl."
         )
     if recipe.method != "sft":
         raise ValueError(f"Unsupported training method for dry_run: {recipe.method}")

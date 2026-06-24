@@ -1,0 +1,17 @@
+{
+  "recipe_id": "verl_sft_sqlite_smoke_v1",
+  "method": "sft",
+  "trainer": "verl",
+  "base_model": "Qwen/Qwen2.5-7B-Instruct",
+  "dataset": "datasets/sft/sqlite_smoke.jsonl",
+  "output_dir": "models",
+  "hyperparameters": {
+    "epochs": 1,
+    "learning_rate": 1e-05,
+    "batch_size": 1,
+    "max_seq_len": 4096
+  },
+  "metadata": {
+    "purpose": "Prepare and optionally launch verl SFT on SoftArena tool-use traces."
+  }
+}

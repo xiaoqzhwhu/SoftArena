@@ -47,6 +47,7 @@ def main() -> None:
     train_subparsers = train_parser.add_subparsers(dest="train_command", required=True)
     train_run_parser = train_subparsers.add_parser("run")
     train_run_parser.add_argument("--recipe", required=True)
+    train_run_parser.add_argument("--execute", action="store_true")
     train_list_parser = train_subparsers.add_parser("list")
     train_list_parser.add_argument("--models-dir", default="models")
 
@@ -138,7 +139,7 @@ def main() -> None:
         return
 
     if args.command == "train" and args.train_command == "run":
-        result = run_training_recipe(TrainingRecipe.from_json(Path(args.recipe)))
+        result = run_training_recipe(TrainingRecipe.from_json(Path(args.recipe)), execute=args.execute)
         print(json.dumps(result, indent=2))
         return
 

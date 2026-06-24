@@ -47,3 +47,26 @@ Current MVP components:
 
 `toolize/` is treated as an external dependency because it is a large tool
 corpus with its own repository.
+
+## verl Trainer Adapter
+
+SoftArena can prepare verl training runs for SFT, reward-filtered SFT (RFT),
+and GRPO:
+
+```bash
+python3 -m softarena train run --recipe configs/training/verl_sft_sqlite_smoke.json
+python3 -m softarena train run --recipe configs/training/verl_rft_sqlite_smoke.json
+python3 -m softarena train run --recipe configs/training/verl_grpo_sqlite_smoke.json
+```
+
+By default these commands prepare verl-formatted data, a `train_manifest.json`,
+and a `launch_verl.sh` script under `models/`. To actually launch verl on a
+GPU machine with verl installed, add `--execute`:
+
+```bash
+python3 -m softarena train run --recipe configs/training/verl_sft_sqlite_smoke.json --execute
+```
+
+The MVP GRPO adapter uses `softarena/training/verl_reward.py` as the reward hook.
+Production GRPO should replace that hook with a verifier-backed reward that
+executes candidate tool trajectories in isolated SoftArena environments.
