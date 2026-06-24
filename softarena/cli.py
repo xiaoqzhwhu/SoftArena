@@ -10,6 +10,7 @@ from softarena.rollout.jobs import RolloutJob, run_rollout_job
 from softarena.rollout.runner import load_tasks, run_episode
 from softarena.training.datasets import build_reward_dataset, build_sft_dataset
 from softarena.training.trainer import TrainingRecipe, list_training_runs, run_training_recipe
+from softarena.doctor import run_doctor
 
 
 def main() -> None:
@@ -18,6 +19,7 @@ def main() -> None:
 
     subparsers.add_parser("list-tools")
     subparsers.add_parser("list-envs")
+    subparsers.add_parser("doctor")
 
     env_parser = subparsers.add_parser("env")
     env_subparsers = env_parser.add_subparsers(dest="env_command", required=True)
@@ -56,6 +58,10 @@ def main() -> None:
     if args.command == "list-tools":
         tools = scan_toolize_tools()
         print(json.dumps({"count": len(tools), "tools": [t.to_dict() for t in tools]}, indent=2))
+        return
+
+    if args.command == "doctor":
+        print(json.dumps(run_doctor(), indent=2))
         return
 
     if args.command == "list-envs":

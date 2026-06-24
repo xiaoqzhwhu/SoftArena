@@ -70,3 +70,16 @@ python3 -m softarena train run --recipe configs/training/verl_sft_sqlite_smoke.j
 The MVP GRPO adapter uses `softarena/training/verl_reward.py` as the reward hook.
 Production GRPO should replace that hook with a verifier-backed reward that
 executes candidate tool trajectories in isolated SoftArena environments.
+
+## Local Smoke Test
+
+On macOS, use the doctor command to validate the local code path without running
+GPU training:
+
+```bash
+python3 -m softarena doctor
+```
+
+It compiles Python sources, discovers registries, runs the SQLite rollout, builds
+SFT/reward datasets, runs the dry-run trainer, and prepares verl SFT/GRPO launchers.
+The latest report is written to `runs/doctor/latest.json`.
