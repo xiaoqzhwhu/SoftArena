@@ -1,0 +1,21 @@
+{
+  "tasks": [
+    {
+      "task_id": "sqlite_customer_revenue_smoke_001",
+      "difficulty": "easy",
+      "prompt": "You are given a SQLite database at {db_path}. The raw_orders table contains order rows. Create a table named customer_revenue with columns customer_id TEXT and total_revenue REAL. Include only rows where status = 'paid'. total_revenue must be the rounded sum of quantity * unit_price per customer, ordered by customer_id when queried. Also create an index named idx_customer_revenue_customer_id on customer_revenue(customer_id).",
+      "orders": [
+        ["c001", "paid", 2, 19.5],
+        ["c001", "cancelled", 1, 100.0],
+        ["c002", "paid", 3, 7.25],
+        ["c003", "paid", 1, 12.0],
+        ["c002", "paid", 2, 8.5]
+      ],
+      "expected_rows": [
+        {"customer_id": "c001", "total_revenue": 39.0},
+        {"customer_id": "c002", "total_revenue": 38.75},
+        {"customer_id": "c003", "total_revenue": 12.0}
+      ]
+    }
+  ]
+}
