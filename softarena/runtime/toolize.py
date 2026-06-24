@@ -70,7 +70,7 @@ class LocalToolizeRuntime:
 
     def _sqlite(self, name: str, arguments: dict[str, Any], timeout: int) -> ToolObservation:
         db_path = arguments["db_path"]
-        sql = arguments.get("sql", "")
+        sql = arguments.get("sql") or arguments.get("query") or ""
         if name in {"sqlite_exec", "sql_execute"} and not sql.lstrip().lower().startswith(("select", "pragma", "with")):
             return self._subprocess(["sqlite3", db_path, sql], None, timeout)
         if name in {"sqlite_query", "sql_execute"}:
