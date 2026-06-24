@@ -107,10 +107,11 @@ python3 -m softarena doctor
 
 SoftArena now separates tool metadata from tool execution:
 
-- Tool metadata comes from `toolize/baseline/*/*/config.toml`.
-- `LocalToolizeRuntime` exposes a stable `runtime.call(tool_id, arguments)` interface.
-- Current local backend executes stable real binaries such as `sqlite3`, `tar`, `file`, `sha256`, and `make`.
-- Future Docker/MCP backends should implement the same runtime interface, so environments do not change.
+- Tool metadata is discovered first from real Toolize adapters under `toolize/bin2mcp/*-mcp`.
+- Tool ids use `bin2mcp/<adapter-dir>/<mcp-tool-name>`, for example `bin2mcp/file-mcp/identify_file`.
+- If `bin2mcp` is absent, the registry falls back to legacy `toolize/baseline/*/*/config.toml` metadata.
+- `LocalToolizeRuntime` exposes a stable `runtime.call(tool_id, arguments)` interface for macOS smoke tests.
+- Docker/MCP backends implement the same runtime interface, so environments do not change.
 
 You can smoke-test the runtime directly:
 
@@ -159,7 +160,7 @@ UDS backend can implement the same `runtime.call(tool_id, arguments)` interface.
 ## Tool ID Validation
 
 Environment `tool_allowlist` entries must be real Toolize tool ids discovered
-from `toolize/baseline/*/*/config.toml`. Validate them with:
+from `toolize/bin2mcp/*-mcp` adapters. Validate them with:
 
 ```bash
 python3 -m softarena env validate-tools

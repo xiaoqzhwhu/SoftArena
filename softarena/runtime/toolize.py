@@ -52,17 +52,17 @@ class LocalToolizeRuntime:
     def _dispatch(self, spec: ToolSpec, arguments: dict[str, Any]) -> ToolObservation:
         name = spec.name
         tool_id = spec.tool_id
-        if name in {"sqlite_exec", "sqlite_query", "sqlite_schema"}:
+        if name in {"sqlite_exec", "sqlite_query", "sqlite_schema", "sql_execute", "sql_describe", "sql_list_tables"}:
             return self._sqlite(name, arguments, spec.timeout_secs)
-        if "tar" in tool_id or name == "tar_extract":
+        if "tar" in tool_id or name in {"tar_extract", "decompress_file"}:
             return self._tar_extract(arguments)
-        if "file" in tool_id or name == "file_identify":
+        if "file" in tool_id or name in {"file_identify", "identify_file", "file_info"}:
             return self._file_identify(arguments)
-        if "sha" in tool_id or name in {"sha256sum", "shasum"}:
+        if "sha" in tool_id or "xxhash" in tool_id or name in {"sha256sum", "shasum", "checksum", "xxhash_compute"}:
             return self._sha256(arguments)
         if name == "openssl_hash":
             return self._openssl_hash(arguments)
-        if name in {"make", "make_test"} or "make" in tool_id:
+        if name in {"make", "make_test", "run_build", "trace_build"} or "make" in tool_id or "bmake" in tool_id:
             return self._make(arguments, spec.timeout_secs)
         if name in {"cc", "gcc", "clang"}:
             return self._subprocess([name] + list(arguments.get("args", [])), arguments.get("cwd"), spec.timeout_secs)
@@ -70,10 +70,11 @@ class LocalToolizeRuntime:
 
     def _sqlite(self, name: str, arguments: dict[str, Any], timeout: int) -> ToolObservation:
         db_path = arguments["db_path"]
-        if name == "sqlite_exec":
-            return self._subprocess(["sqlite3", db_path, arguments["sql"]], None, timeout)
-        if name == "sqlite_query":
-            result = subprocess.run(["sqlite3", "-json", db_path, arguments["sql"]], text=True, capture_output=True, timeout=timeout, check=False)
+        sql = arguments.get("sql", "")
+        if name in {"sqlite_exec", "sql_execute"} and not sql.lstrip().lower().startswith(("select", "pragma", "with")):
+            return self._subprocess(["sqlite3", db_path, sql], None, timeout)
+        if name in {"sqlite_query", "sql_execute"}:
+            result = subprocess.run(["sqlite3", "-json", db_path, sql], text=True, capture_output=True, timeout=timeout, check=False)
             content: Any = []
             if result.stdout.strip():
                 content = json.loads(result.stdout)
@@ -86,6 +87,8 @@ class LocalToolizeRuntime:
                 columns = [dict(col) for col in conn.execute(f"PRAGMA table_info({row['name']})").fetchall()]
                 indexes = [dict(idx) for idx in conn.execute(f"PRAGMA index_list({row['name']})").fetchall()]
                 tables[row["name"]] = {"create_sql": row["sql"], "columns": columns, "indexes": indexes}
+            if name == "sql_list_tables":
+                return ToolObservation(ok=True, content={"tables": sorted(tables)})
             return ToolObservation(ok=True, content={"tables": tables})
         finally:
             conn.close()
@@ -104,9 +107,12 @@ class LocalToolizeRuntime:
         return ToolObservation(ok=result.returncode == 0, content={"file_type": file_type}, stdout=result.stdout, stderr=result.stderr, returncode=result.returncode)
 
     def _sha256(self, arguments: dict[str, Any]) -> ToolObservation:
+        if "data" in arguments:
+            digest = hashlib.sha256(str(arguments["data"]).encode()).hexdigest()
+            return ToolObservation(ok=True, content={"sha256": digest, "hash": digest}, stdout=digest + "\n")
         path = Path(arguments["path"])
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        return ToolObservation(ok=True, content={"sha256": digest}, stdout=f"{digest}  {path}\n")
+        return ToolObservation(ok=True, content={"sha256": digest, "hash": digest}, stdout=f"{digest}  {path}\n")
 
     def _openssl_hash(self, arguments: dict[str, Any]) -> ToolObservation:
         algorithm = arguments.get("algorithm", "sha256")
