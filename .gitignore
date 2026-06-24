@@ -9,3 +9,6 @@ softarena/registry/*_index.generated.json
 # Toolize is a large external tool corpus. Keep it outside the first
 # SoftArena source commit; wire it as a submodule or documented dependency.
 toolize/
+models/
+.tmp_video_frames/
+.tmp_video_frames_jpg/

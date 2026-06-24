@@ -1,0 +1,17 @@
+{
+  "recipe_id": "sft_sqlite_smoke_v1",
+  "method": "sft",
+  "trainer": "dry_run",
+  "base_model": "placeholder/tool-agent-base",
+  "dataset": "datasets/sft/sqlite_smoke.jsonl",
+  "output_dir": "models",
+  "hyperparameters": {
+    "epochs": 1,
+    "learning_rate": 0.00001,
+    "batch_size": 1,
+    "max_seq_len": 4096
+  },
+  "metadata": {
+    "purpose": "Smoke-test the SoftArena training pipeline without requiring GPU dependencies."
+  }
+}

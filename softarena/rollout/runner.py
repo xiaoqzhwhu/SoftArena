@@ -18,7 +18,15 @@ def load_tasks(env: EnvSpec, split: str) -> list[dict[str, Any]]:
     return list(payload["tasks"])
 
 
-def run_episode(env: EnvSpec, task: dict[str, Any], model: str, output_dir: Path) -> dict[str, Any]:
+def run_episode(
+    env: EnvSpec,
+    task: dict[str, Any],
+    model: str,
+    output_dir: Path,
+    split: str = "smoke",
+    seed: int = 0,
+    policy: str = "scripted_sqlite",
+) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     init_fn = load_entrypoint(env, env.entrypoint["init"])
     verify_fn = load_entrypoint(env, env.entrypoint["verifier"])
@@ -27,19 +35,22 @@ def run_episode(env: EnvSpec, task: dict[str, Any], model: str, output_dir: Path
         workspace = Path(tmp)
         episode = init_fn(task, workspace)
         start_time = time.time()
+        if policy != "scripted_sqlite":
+            raise ValueError(f"Unsupported policy: {policy}")
         steps = scripted_sqlite_policy(episode)
         verifier = verify_fn(episode)
         elapsed_ms = int((time.time() - start_time) * 1000)
         final_answer = "Created customer_revenue and idx_customer_revenue_customer_id."
 
         trajectory = {
-            "episode_id": f"{env.env_id}:{task['task_id']}:seed0",
+            "episode_id": f"{env.env_id}:{task['task_id']}:seed{seed}",
             "env_id": env.env_id,
             "env_version": env.version,
             "task_id": task["task_id"],
-            "split": "smoke",
+            "split": split,
+            "seed": seed,
             "difficulty": task.get("difficulty", "unknown"),
-            "model": {"name": model, "kind": "scripted"},
+            "model": {"name": model, "kind": "scripted", "policy": policy},
             "prompt": episode["prompt"],
             "messages": build_training_messages(episode["prompt"], steps, final_answer),
             "steps": steps,
@@ -48,7 +59,7 @@ def run_episode(env: EnvSpec, task: dict[str, Any], model: str, output_dir: Path
             "elapsed_ms": elapsed_ms,
         }
 
-        out_path = output_dir / f"{task['task_id']}.json"
+        out_path = output_dir / f"{task['task_id']}_seed{seed}.json"
         out_path.write_text(json.dumps(trajectory, indent=2, ensure_ascii=False) + "\n")
         return trajectory
 

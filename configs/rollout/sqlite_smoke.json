@@ -1,0 +1,10 @@
+{
+  "job_id": "sqlite_smoke_rollout_v1",
+  "env_id": "software_engineering.sqlite_data_repair.v1",
+  "split": "smoke",
+  "model": "scripted-sqlite-v0",
+  "policy": "scripted_sqlite",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}
