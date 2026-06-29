@@ -79,6 +79,8 @@ def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any], runti
             "software_engineering.build_fix.v1": "scripted_build_fix",
             "network.dns_debug.v1": "scripted_dns_debug",
             "finance.accounting_reconcile.v1": "scripted_accounting_reconcile",
+            "computing_math.weighted_metrics.v0": "scripted_weighted_metrics",
+            "computing_math.project_sync_sqlite.v0": "scripted_project_sync_sqlite",
         }.get(env_id, "scripted_sqlite")
     policies = {
         "scripted_sqlite": scripted_sqlite_policy,
@@ -87,6 +89,8 @@ def run_scripted_policy(policy: str, env_id: str, episode: dict[str, Any], runti
         "scripted_build_fix": scripted_build_fix_policy,
         "scripted_dns_debug": scripted_dns_debug_policy,
         "scripted_accounting_reconcile": scripted_accounting_reconcile_policy,
+        "scripted_weighted_metrics": scripted_weighted_metrics_policy,
+        "scripted_project_sync_sqlite": scripted_project_sync_sqlite_policy,
     }
     if policy not in policies:
         raise ValueError(f"Unsupported policy: {policy}")
@@ -171,6 +175,118 @@ def scripted_accounting_reconcile_policy(episode: dict[str, Any], runtime: ToolR
     return [
         make_step(0, "bin2mcp/postgresql-client-mcp/sql_execute", {"db_path": episode["db_path"], "sql": sql}, "Aggregate ledger and bank totals into a reconciliation report.", obs),
         make_step(1, "bin2mcp/postgresql-client-mcp/sql_execute", {"db_path": episode["db_path"], "sql": "SELECT * FROM reconciliation_report ORDER BY account_id"}, "Inspect the final reconciliation rows.", query),
+    ]
+
+
+def scripted_weighted_metrics_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
+    sql = """
+    DROP TABLE IF EXISTS segment_metrics;
+    CREATE TABLE segment_metrics AS
+    SELECT segment,
+           ROUND(SUM(value * weight) / SUM(weight), 4) AS weighted_mean,
+           COUNT(*) AS n
+    FROM observations
+    WHERE include_flag = 1
+    GROUP BY segment;
+    """
+    create_obs = runtime.call(
+        "bin2mcp/postgresql-client-mcp/sql_execute",
+        {"db_path": episode["db_path"], "sql": sql},
+    )
+    query_obs = runtime.call(
+        "bin2mcp/postgresql-client-mcp/sql_execute",
+        {
+            "db_path": episode["db_path"],
+            "sql": "SELECT segment, weighted_mean, n FROM segment_metrics ORDER BY segment",
+        },
+    )
+    return [
+        make_step(
+            0,
+            "bin2mcp/postgresql-client-mcp/sql_execute",
+            {"db_path": episode["db_path"], "sql": sql},
+            "Compute weighted means for included observations by segment.",
+            create_obs,
+        ),
+        make_step(
+            1,
+            "bin2mcp/postgresql-client-mcp/sql_execute",
+            {
+                "db_path": episode["db_path"],
+                "sql": "SELECT segment, weighted_mean, n FROM segment_metrics ORDER BY segment",
+            },
+            "Inspect the deterministic segment metrics output.",
+            query_obs,
+        ),
+    ]
+
+
+def scripted_project_sync_sqlite_policy(episode: dict[str, Any], runtime: ToolRuntime) -> list[dict[str, Any]]:
+    db_path = episode["db_path"]
+    artifact_rows = runtime.call(
+        "bin2mcp/postgresql-client-mcp/sql_execute",
+        {"db_path": db_path, "sql": "SELECT artifact, source_name FROM artifact_requirements ORDER BY artifact"},
+    )
+    content = artifact_rows.get("content") if artifact_rows.get("ok") else []
+    rows = content if isinstance(content, list) else (content.get("rows") or []) if isinstance(content, dict) else []
+    values = []
+    for row in rows:
+        artifact = str(row.get("artifact") or "").replace("'", "''")
+        source_name = str(row.get("source_name") or artifact).replace("'", "''")
+        if artifact:
+            values.append(f"('{artifact}', 'ready', 'validated requirement from {source_name}')")
+    if not values:
+        values.append("('artifact_requirements', 'blocked', 'no artifact requirements found')")
+
+    sql = f"""
+    DROP TABLE IF EXISTS project_sync_report;
+    CREATE TABLE project_sync_report (
+      artifact TEXT PRIMARY KEY,
+      status TEXT NOT NULL,
+      evidence TEXT NOT NULL
+    );
+    INSERT INTO project_sync_report VALUES
+      {", ".join(values)};
+    DROP TABLE IF EXISTS report_status;
+    CREATE TABLE report_status (status TEXT NOT NULL, evidence TEXT NOT NULL);
+    INSERT INTO report_status VALUES ('ready', 'project_sync_report has all required artifacts');
+    """
+    create_obs = runtime.call(
+        "bin2mcp/postgresql-client-mcp/sql_execute",
+        {"db_path": db_path, "sql": sql},
+    )
+    query_obs = runtime.call(
+        "bin2mcp/postgresql-client-mcp/sql_execute",
+        {
+            "db_path": db_path,
+            "sql": "SELECT artifact, status, evidence FROM project_sync_report ORDER BY artifact",
+        },
+    )
+    return [
+        make_step(
+            0,
+            "bin2mcp/postgresql-client-mcp/sql_execute",
+            {"db_path": db_path, "sql": "SELECT artifact, source_name FROM artifact_requirements ORDER BY artifact"},
+            "Read the artifact requirements before building the readiness report.",
+            artifact_rows,
+        ),
+        make_step(
+            1,
+            "bin2mcp/postgresql-client-mcp/sql_execute",
+            {"db_path": db_path, "sql": sql},
+            "Create the deterministic project synchronization report and ready status.",
+            create_obs,
+        ),
+        make_step(
+            2,
+            "bin2mcp/postgresql-client-mcp/sql_execute",
+            {
+                "db_path": db_path,
+                "sql": "SELECT artifact, status, evidence FROM project_sync_report ORDER BY artifact",
+            },
+            "Inspect the final project synchronization report rows.",
+            query_obs,
+        ),
     ]
 
 

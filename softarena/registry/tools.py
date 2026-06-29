@@ -34,7 +34,69 @@ def scan_toolize_tools(root: Path | None = None) -> list[ToolSpec]:
     specs = scan_bin2mcp_tools(root)
     if specs:
         return specs
-    return scan_baseline_tools(root)
+    specs = scan_baseline_tools(root)
+    if specs:
+        return specs
+    return builtin_mvp_tools()
+
+
+def builtin_mvp_tools() -> list[ToolSpec]:
+    """Minimal local tool metadata for SoftArena smoke environments.
+
+    Real Toolize metadata wins whenever `toolize/bin2mcp` or legacy baseline
+    configs are present. These specs keep the repository self-testable before
+    the large external Toolize corpus is installed.
+    """
+    specs = [
+        _builtin_tool("postgresql-client-mcp", "sql_execute", "Execute SQL against a local database.", {"db_path": "string", "sql": "string"}, ["db_path", "sql"]),
+        _builtin_tool("postgresql-client-mcp", "sql_describe", "Describe the local database schema.", {"db_path": "string"}, ["db_path"]),
+        _builtin_tool("postgresql-client-mcp", "sql_list_tables", "List local database tables.", {"db_path": "string"}, ["db_path"]),
+        _builtin_tool("postgresql-client-mcp", "sql_export_csv", "Export a SQL result set as CSV.", {"db_path": "string", "sql": "string", "output_path": "string"}, ["db_path", "sql", "output_path"]),
+        _builtin_tool("bind9-dnsutils-mcp", "dns_lookup", "Resolve a domain name.", {"domain": "string"}, ["domain"]),
+        _builtin_tool("bind9-dnsutils-mcp", "dns_reverse_lookup", "Resolve a reverse DNS name.", {"ip": "string"}, ["ip"]),
+        _builtin_tool("bind9-dnsutils-mcp", "dns_set_server", "Select the DNS server used by later lookups.", {"server": "string"}, ["server"]),
+        _builtin_tool("bind9-dnsutils-mcp", "dns_ping", "Probe DNS-related reachability for a domain.", {"domain": "string"}, ["domain"]),
+        _builtin_tool("busybox-mcp", "decompress_file", "Extract an archive into an output directory.", {"archive_path": "string", "output_dir": "string"}, ["archive_path", "output_dir"]),
+        _builtin_tool("busybox-mcp", "file_info", "Return basic metadata for a file.", {"path": "string"}, ["path"]),
+        _builtin_tool("busybox-mcp", "checksum", "Compute a file checksum.", {"path": "string"}, ["path"]),
+        _builtin_tool("busybox-mcp", "write_file", "Write content to a file.", {"path": "string", "content": "string"}, ["path"]),
+        _builtin_tool("busybox-mcp", "read_file", "Read a file.", {"path": "string"}, ["path"]),
+        _builtin_tool("busybox-mcp", "search_files", "Search files under a path.", {"path": "string", "pattern": "string"}, ["path", "pattern"]),
+        _builtin_tool("file-mcp", "identify_file", "Identify a file type.", {"path": "string"}, ["path"]),
+        _builtin_tool("xxhash-mcp", "xxhash_compute", "Compute a digest for data.", {"data": "string", "algorithm": "string"}, ["data"]),
+        _builtin_tool("ffjson-mcp", "generate_ffjson", "Generate filtered JSON output.", {"filter": "string"}, ["filter"]),
+        _builtin_tool("bmake-mcp", "run_build", "Run a build target.", {"cwd": "string", "target": "string"}, ["cwd"]),
+        _builtin_tool("bmake-mcp", "trace_build", "Trace a build target.", {"cwd": "string", "target": "string"}, ["cwd"]),
+        _builtin_tool("bmake-mcp", "makefile_targets", "List Makefile targets.", {"cwd": "string"}, ["cwd"]),
+        _builtin_tool("clang-mcp", "clang_compile", "Compile source files with clang.", {"cwd": "string", "args": "string"}, ["cwd"]),
+        _builtin_tool("bear-mcp", "run_intercepted_build", "Run a build while recording compile commands.", {"cwd": "string", "target": "string"}, ["cwd"]),
+        _builtin_tool("bear-mcp", "get_compile_commands", "Return compile commands for a project.", {"cwd": "string"}, ["cwd"]),
+    ]
+    return sorted(specs, key=lambda spec: spec.tool_id)
+
+
+def _builtin_tool(
+    package: str,
+    name: str,
+    description: str,
+    properties: dict[str, str],
+    required: list[str],
+) -> ToolSpec:
+    return ToolSpec(
+        tool_id=f"bin2mcp/{package}/{name}",
+        package=package,
+        category="bin2mcp",
+        name=name,
+        description=description,
+        timeout_secs=300,
+        schema={
+            "type": "object",
+            "properties": {key: {"type": value} for key, value in properties.items()},
+            "required": required,
+        },
+        command=None,
+        args=[],
+    )
 
 
 def scan_bin2mcp_tools(root: Path | None = None) -> list[ToolSpec]:

@@ -1,0 +1,3709 @@
+{
+  "tasks": [
+    {
+      "task_id": "tool_seed_001_8e718778",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_ed7498154c",
+      "title": "从零搭建项目同步机制并用SQLite登记风险与RACI",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_001_8e718778",
+        "source_task_id": "searchagent-search_seed_ed7498154c",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "从零搭建项目同步机制并用SQLite登记风险与RACI",
+        "subdomain": "项目与协作/项目同步机制",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "project_sync_sop",
+            "source_name": "project_sync_sop.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: project_sync_sop.md"
+          },
+          {
+            "artifact": "weekly_update_template",
+            "source_name": "weekly_update_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: weekly_update_template.md"
+          },
+          {
+            "artifact": "risk_register_schema",
+            "source_name": "risk_register_schema.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_register_schema.sql"
+          },
+          {
+            "artifact": "raci_matrix",
+            "source_name": "raci_matrix.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: raci_matrix.md"
+          },
+          {
+            "artifact": "maintenance_runbook",
+            "source_name": "maintenance_runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_runbook.md"
+          }
+        ],
+        "failure_modes": [
+          "只给泛泛建议没有可复制模板",
+          "SQL语法不可执行或缺少主键/状态约束",
+          "RACI角色与会议机制不一致",
+          "引入真实历史数据依赖"
+        ],
+        "validation_metric": "sqlite3 :memory: < risk_register_schema.sql 成功；生成物覆盖SOP、周报、风险、RACI四类且每类不少于5个可执行条目。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在没有现成流程和历史材料的情况下，基于团队规模、项目周期、协作工具、会议频率，生成可直接落地的项目同步SOP、周报模板、风险登记册、RACI，并提供一个sqlite3可执行的轻量登记库用于维护风险、决策和责任人。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "project_sync_sop",
+        "weekly_update_template",
+        "risk_register_schema",
+        "raci_matrix",
+        "maintenance_runbook"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_002_492615f7",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_f88c4bdce9",
+      "title": "为开源Python包设计发布流程并用jq校验GitHub Actions模板",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_002_492615f7",
+        "source_task_id": "searchagent-search_seed_f88c4bdce9",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "为开源Python包设计发布流程并用jq校验GitHub Actions模板",
+        "subdomain": "编码开发/发布流程",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "release_checklist",
+            "source_name": "release_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release_checklist.md"
+          },
+          {
+            "artifact": "release",
+            "source_name": ".github/workflows/release.yml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: .github/workflows/release.yml"
+          },
+          {
+            "artifact": "rollback_runbook",
+            "source_name": "rollback_runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback_runbook.md"
+          },
+          {
+            "artifact": "release_policy",
+            "source_name": "release_policy.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release_policy.json"
+          },
+          {
+            "artifact": "maintainer_notes",
+            "source_name": "maintainer_notes.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintainer_notes.md"
+          }
+        ],
+        "failure_modes": [
+          "把GitHub Actions写成不可落地的伪代码",
+          "缺少失败发布后的回滚/沟通路径",
+          "JSON不合法或字段与文档不一致",
+          "要求查看现有仓库或历史日志"
+        ],
+        "validation_metric": "jq -e '.versioning and .preflight and .publish and .rollback and .owners' release_policy.json 通过；发布清单含至少10项且按preflight/build/publish/post-release分组。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在没有现有发布流程的情况下，基于语言、包管理器、发布频率、是否开源，生成发布checklist、GitHub Actions发布工作流模板、回滚runbook和维护说明，并提供可由jq检查的结构化发布配置样例。 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "release_checklist",
+        "release",
+        "rollback_runbook",
+        "release_policy",
+        "maintainer_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_003_927f59b6",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_b0e9d33523",
+      "title": "API Design Starter Kit with grep/awk Consistency Gates",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_003_927f59b6",
+        "source_task_id": "searchagent-search_seed_b0e9d33523",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "API Design Starter Kit with grep/awk Consistency Gates",
+        "subdomain": "coding_api_design",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "api_design_checklist",
+            "source_name": "api_design_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: api_design_checklist.md"
+          },
+          {
+            "artifact": "error_codes",
+            "source_name": "error_codes.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: error_codes.md"
+          },
+          {
+            "artifact": "openapi_template",
+            "source_name": "openapi_template.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: openapi_template.yaml"
+          },
+          {
+            "artifact": "review_workflow",
+            "source_name": "review_workflow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: review_workflow.md"
+          },
+          {
+            "artifact": "validation_notes",
+            "source_name": "validation_notes.txt",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_notes.txt"
+          }
+        ],
+        "failure_modes": [
+          "Generic advice without directly usable templates.",
+          "OpenAPI skeleton missing auth/error response examples.",
+          "Inconsistent error-code prefixes between spec and markdown.",
+          "Invents historical metrics, customer examples, or repo-specific facts.",
+          "Tool use is decorative and does not validate generated artifacts."
+        ],
+        "validation_metric": "All required artifact files exist; rg finds mandatory terms in the right files; mawk-derived counts show at least 6 checklist items, 8 error codes, and matching error-code prefixes across artifacts.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: From only API type, authentication method, and team size, produce an implementable API design checklist, error-code convention, OpenAPI skeleton, and rollout workflow; no historical files, logs, customer data, existing repo, or PR diffs are provided. 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "api_design_checklist",
+        "error_codes",
+        "openapi_template",
+        "review_workflow",
+        "validation_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_004_7490cd25",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_e164df520b",
+      "title": "Shell-Scriptable QA Process Kit Linted with ShellCheck",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_004_7490cd25",
+        "source_task_id": "searchagent-search_seed_e164df520b",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Shell-Scriptable QA Process Kit Linted with ShellCheck",
+        "subdomain": "coding_test_strategy",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "testing_strategy",
+            "source_name": "testing_strategy.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: testing_strategy.md"
+          },
+          {
+            "artifact": "dod_checklist",
+            "source_name": "dod_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: dod_checklist.md"
+          },
+          {
+            "artifact": "qa_workflow",
+            "source_name": "qa_workflow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: qa_workflow.md"
+          },
+          {
+            "artifact": "release_gate",
+            "source_name": "release_gate.sh",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release_gate.sh"
+          },
+          {
+            "artifact": "maintenance_playbook",
+            "source_name": "maintenance_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_playbook.md"
+          }
+        ],
+        "failure_modes": [
+          "Only high-level testing philosophy, no executable workflow.",
+          "Checklist lacks ownership, thresholds, or exception handling.",
+          "Shell script contains unsafe quoting, brittle paths, or hard-coded private project names.",
+          "Claims to inspect real CI history or logs despite forbidden materials.",
+          "Ignores ShellCheck findings."
+        ],
+        "validation_metric": "Artifacts cover strategy, DoD, QA flow, gate script, and maintenance; shellcheck exits cleanly on release_gate.sh; checklist contains at least 10 verifiable pass/fail items with owners.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: From only technology stack, team size, and release frequency, generate a practical testing strategy, Definition of Done checklist, QA workflow, and a small shell-based release gate script; no existing codebase, logs, CSVs, screenshots, tickets, or PR diffs are provided. 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "testing_strategy",
+        "dod_checklist",
+        "qa_workflow",
+        "release_gate",
+        "maintenance_playbook"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_005_f855896f",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c7c8dec77d",
+      "title": "sample numerical toolkit: Pylint-Driven Maintainability Triage for Solver Wrapper Modules",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_005_f855896f",
+        "source_task_id": "searchagent-search_seed_c7c8dec77d",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: Pylint-Driven Maintainability Triage for Solver Wrapper Modules",
+        "subdomain": "scientific Python static analysis",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "pylint_report_summary",
+            "source_name": "pylint report summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: pylint report summary"
+          },
+          {
+            "artifact": "ranked_issue_table",
+            "source_name": "ranked issue table",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ranked issue table"
+          },
+          {
+            "artifact": "module_level_risk_notes",
+            "source_name": "module-level risk notes",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: module-level risk notes"
+          },
+          {
+            "artifact": "minimal_patch_recommendations",
+            "source_name": "minimal patch recommendations",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: minimal patch recommendations"
+          },
+          {
+            "artifact": "regression_check_checklist",
+            "source_name": "regression-check checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: regression-check checklist"
+          }
+        ],
+        "failure_modes": [
+          "Treats every pylint warning as equally important",
+          "Proposes broad rewrites of numerical code without evidence",
+          "Ignores generated/vendor files",
+          "Fails to explain why a warning matters for maintainability or correctness"
+        ],
+        "validation_metric": "At least 5 actionable findings are prioritized with file/function location, pylint category, risk rationale, and a behavior-preserving fix strategy.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: The maintainer needs a lightweight, reproducible review of Python modules without running simulations or using private datasets, identifying high-impact lint issues, risky API patterns, and a prioritized remediation plan that preserves numerical behavior. 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "pylint_report_summary",
+        "ranked_issue_table",
+        "module_level_risk_notes",
+        "minimal_patch_recommendations",
+        "regression_check_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_006_58520ee5",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_feb924a2fa",
+      "title": "sample numerical toolkit: Native Extension Change-Risk Review with cppcheck and diffstat",
+      "selected_tools": [
+        "cppcheck",
+        "diffstat"
+      ],
+      "materials": {
+        "task_id": "tool_seed_006_58520ee5",
+        "source_task_id": "searchagent-search_seed_feb924a2fa",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: Native Extension Change-Risk Review with cppcheck and diffstat",
+        "subdomain": "C/C++ extension static review for Python packages",
+        "selected_tools": [
+          "cppcheck",
+          "diffstat"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "diffstat_footprint_summary",
+            "source_name": "diffstat footprint summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: diffstat footprint summary"
+          },
+          {
+            "artifact": "cppcheck_finding_digest",
+            "source_name": "cppcheck finding digest",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: cppcheck finding digest"
+          },
+          {
+            "artifact": "merge_risk_matrix",
+            "source_name": "merge-risk matrix",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: merge-risk matrix"
+          },
+          {
+            "artifact": "suspect_code_annotations",
+            "source_name": "suspect-code annotations",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: suspect-code annotations"
+          },
+          {
+            "artifact": "release_gate_recommendation",
+            "source_name": "release gate recommendation",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release gate recommendation"
+          }
+        ],
+        "failure_modes": [
+          "Reports diffstat numbers without interpreting risk",
+          "Overstates cppcheck warnings as confirmed bugs",
+          "Misses changed native files that affect Python bindings",
+          "Recommends runtime testing as the only validation path"
+        ],
+        "validation_metric": "Produces a merge decision supported by diffstat concentration, cppcheck severity grouping, and at least 3 concrete code areas requiring reviewer attention.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Before merging a native-code update, the release engineer needs a compact risk assessment using only static evidence: size and shape of the diff, cppcheck findings, likely memory/resource hazards, and merge-blocking versus follow-up recommendations. 候选工具: cppcheck, diffstat. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "diffstat_footprint_summary",
+        "cppcheck_finding_digest",
+        "merge_risk_matrix",
+        "suspect_code_annotations",
+        "release_gate_recommendation"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_007_d0233ba7",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_fee4a758f3",
+      "title": "sample numerical toolkit: Native-Kernel Coverage Gate with gcovr",
+      "selected_tools": [
+        "gcovr"
+      ],
+      "materials": {
+        "task_id": "tool_seed_007_d0233ba7",
+        "source_task_id": "searchagent-search_seed_fee4a758f3",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: Native-Kernel Coverage Gate with gcovr",
+        "subdomain": "Python numerical/scientific computing QA",
+        "selected_tools": [
+          "gcovr"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "coverage_command_plan",
+            "source_name": "coverage command plan",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage command plan"
+          },
+          {
+            "artifact": "xml_report_expectations",
+            "source_name": "gcovr HTML/XML report expectations",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: gcovr HTML/XML report expectations"
+          },
+          {
+            "artifact": "coverage_threshold_policy",
+            "source_name": "coverage threshold policy",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage threshold policy"
+          },
+          {
+            "artifact": "uncovered_branch_triage_checklist",
+            "source_name": "uncovered-branch triage checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: uncovered-branch triage checklist"
+          },
+          {
+            "artifact": "ci_gate_acceptance_notes",
+            "source_name": "CI gate acceptance notes",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: CI gate acceptance notes"
+          }
+        ],
+        "failure_modes": [
+          "Counts generated or vendored files as product code.",
+          "Only reports line coverage and ignores branch-heavy Riemann solver paths.",
+          "Uses private logs or historical coverage data as required inputs.",
+          "Defines thresholds with no rationale or no failure behavior.",
+          "Produces a final task package instead of a seed spec."
+        ],
+        "validation_metric": "gcovr report generated with branch coverage enabled and a documented gate such as >=80% line coverage and >=70% branch coverage on declared source paths.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Before publishing a sample numerical toolkit build that wraps native wave-propagation kernels, the maintainer needs a reproducible seed task to add coverage collection, summarize uncovered solver branches, and define a pass/fail coverage gate without relying on private project history. 候选工具: gcovr. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "coverage_command_plan",
+        "xml_report_expectations",
+        "coverage_threshold_policy",
+        "uncovered_branch_triage_checklist",
+        "ci_gate_acceptance_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_008_1b69a77b",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_1305880777",
+      "title": "sample numerical toolkit: Demo Docs Serving and Benchmark Seed with nginx and ab",
+      "selected_tools": [
+        "apache2-utils",
+        "nginx"
+      ],
+      "materials": {
+        "task_id": "tool_seed_008_1b69a77b",
+        "source_task_id": "searchagent-search_seed_1305880777",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: Demo Docs Serving and Benchmark Seed with nginx and ab",
+        "subdomain": "Python package release infrastructure",
+        "selected_tools": [
+          "apache2-utils",
+          "nginx"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "minimal_nginx_site_config",
+            "source_name": "minimal nginx site config",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: minimal nginx site config"
+          },
+          {
+            "artifact": "demo_artifact_layout",
+            "source_name": "static/demo artifact layout",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: static/demo artifact layout"
+          },
+          {
+            "artifact": "ab_benchmark_command_matrix",
+            "source_name": "ab benchmark command matrix",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ab benchmark command matrix"
+          },
+          {
+            "artifact": "throughput_result_template",
+            "source_name": "latency/throughput result template",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: latency/throughput result template"
+          },
+          {
+            "artifact": "rollback_and_troubleshooting_checklist",
+            "source_name": "rollback and troubleshooting checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback and troubleshooting checklist"
+          }
+        ],
+        "failure_modes": [
+          "Requires production traffic logs or customer traces.",
+          "Benchmarks an external service instead of a local controlled nginx endpoint.",
+          "Confuses apache2-utils with running Apache httpd.",
+          "Omits HTTP status/error-rate validation.",
+          "Turns the seed into a full SoftArena deliverable with fixed files and hidden tests."
+        ],
+        "validation_metric": "Local nginx endpoint returns expected 2xx responses and ab run meets declared baseline, e.g. 1000 requests at concurrency 20 with 0 failed requests and documented requests/sec plus mean latency.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: The release engineer needs a seed task for serving sample numerical toolkit generated examples or API docs through nginx and using apache2-utils benchmarking to verify a simple, repeatable performance baseline before sharing the release candidate. 候选工具: apache2-utils, nginx. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "minimal_nginx_site_config",
+        "demo_artifact_layout",
+        "ab_benchmark_command_matrix",
+        "throughput_result_template",
+        "rollback_and_troubleshooting_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_009_9e55cba1",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_478d6c2510",
+      "title": "sample numerical toolkit YAML-driven developer onboarding kit generator",
+      "selected_tools": [
+        "node-js-yaml"
+      ],
+      "materials": {
+        "task_id": "tool_seed_009_9e55cba1",
+        "source_task_id": "searchagent-search_seed_478d6c2510",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit YAML-driven developer onboarding kit generator",
+        "subdomain": "编码开发/开发者入职和协作",
+        "selected_tools": [
+          "node-js-yaml"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "onboarding",
+            "source_name": "onboarding.yaml 配置种子",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: onboarding.yaml 配置种子"
+          },
+          {
+            "artifact": "contributing",
+            "source_name": "CONTRIBUTING.md 模板",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: CONTRIBUTING.md 模板"
+          },
+          {
+            "artifact": "code_review_checklist",
+            "source_name": "code_review_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: code_review_checklist.md"
+          },
+          {
+            "artifact": "90_day_onboarding_plan",
+            "source_name": "30/60/90_day_onboarding_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 30/60/90_day_onboarding_plan.md"
+          },
+          {
+            "artifact": "maintenance_playbook",
+            "source_name": "maintenance_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_playbook.md"
+          }
+        ],
+        "failure_modes": [
+          "生成无法解析的 YAML",
+          "把任务变成分析现有仓库或 PR diff",
+          "缺少新人首周可执行步骤",
+          "代码审查清单只有泛泛原则无验收标准",
+          "未说明模板维护责任人和更新节奏"
+        ],
+        "validation_metric": "node-js-yaml 能成功解析配置；最终至少包含 5 类入职/协作产物、20 条以上可执行检查项、3 类异常处理路径。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不提供现有代码库、PR diff、日志或历史文档的情况下，仅基于技术栈、团队规模、代码托管平台、入职周期，生成可落地的开发者入职清单、贡献指南模板、代码审查清单和协作落地流程。 候选工具: node-js-yaml. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "onboarding",
+        "contributing",
+        "code_review_checklist",
+        "90_day_onboarding_plan",
+        "maintenance_playbook"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_010_23cf1ce7",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_e8752d5f80",
+      "title": "sample numerical toolkit SQLite-backed shared inbox SOP planner",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_010_23cf1ce7",
+        "source_task_id": "searchagent-search_seed_e8752d5f80",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit SQLite-backed shared inbox SOP planner",
+        "subdomain": "办公自动化/邮件和共享收件箱",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "inbox_rules",
+            "source_name": "inbox_rules.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: inbox_rules.sql"
+          },
+          {
+            "artifact": "shared_inbox_sop",
+            "source_name": "shared_inbox_sop.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shared_inbox_sop.md"
+          },
+          {
+            "artifact": "routing_matrix",
+            "source_name": "routing_matrix.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: routing_matrix.md"
+          },
+          {
+            "artifact": "response_templates",
+            "source_name": "response_templates.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: response_templates.md"
+          },
+          {
+            "artifact": "sla_escalation_playbook",
+            "source_name": "sla_escalation_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: sla_escalation_playbook.md"
+          },
+          {
+            "artifact": "maintenance_checklist",
+            "source_name": "maintenance_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "要求用户导入真实邮件或 CSV",
+          "SQL 表结构缺少 SLA/升级角色字段",
+          "回复模板不可直接复制使用",
+          "分流规则冲突且未给优先级",
+          "没有异常邮件、无人认领、超时响应的处理方式"
+        ],
+        "validation_metric": "sqlite3 执行建表和样例查询成功；产物包含不少于 8 条分流规则、6 个回复模板、4 个 SLA 升级场景和一份完整 SOP。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不提供邮件正文、真实客户数据、历史文件、CSV、截图或聊天记录的情况下，仅基于邮箱类型、团队规模、响应时限、升级角色，生成共享收件箱 SOP、邮件分流规则、回复模板和落地维护流程。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "inbox_rules",
+        "shared_inbox_sop",
+        "routing_matrix",
+        "response_templates",
+        "sla_escalation_playbook",
+        "maintenance_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_011_1bd8fc4f",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_94f2163d3a",
+      "title": "Incident response runbook pack with machine-checkable severity matrix",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_011_1bd8fc4f",
+        "source_task_id": "searchagent-search_seed_94f2163d3a",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Incident response runbook pack with machine-checkable severity matrix",
+        "subdomain": "IT与安全/事故响应和复盘",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "incident_runbook",
+            "source_name": "incident_runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: incident_runbook.md"
+          },
+          {
+            "artifact": "postmortem_template",
+            "source_name": "postmortem_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: postmortem_template.md"
+          },
+          {
+            "artifact": "severity_matrix",
+            "source_name": "severity_matrix.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: severity_matrix.json"
+          },
+          {
+            "artifact": "escalation_policy",
+            "source_name": "escalation_policy.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: escalation_policy.json"
+          },
+          {
+            "artifact": "validation_report",
+            "source_name": "validation_report.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_report.json"
+          }
+        ],
+        "failure_modes": [
+          "Produces generic prose without executable checklists.",
+          "Severity levels lack objective criteria or response times.",
+          "Escalation policy conflicts with stated on-call model.",
+          "Uses forbidden historical/log/customer materials despite L1-only demand.",
+          "JSON is invalid or inconsistent with markdown content."
+        ],
+        "validation_metric": "jq parses all JSON plus >=90% required incident-kit fields present in structured artifacts",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Generate a practical incident response and postmortem starter kit from only service type, team size, on-call model, and notification channels: runbook, postmortem template, severity matrix, escalation policy, maintenance cadence, and exception handling notes. 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "incident_runbook",
+        "postmortem_template",
+        "severity_matrix",
+        "escalation_policy",
+        "validation_report"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_012_c222b89b",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_b811b33ba5",
+      "title": "Small-business SOP manual scaffold with searchable responsibility matrix",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_012_c222b89b",
+        "source_task_id": "searchagent-search_seed_b811b33ba5",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Small-business SOP manual scaffold with searchable responsibility matrix",
+        "subdomain": "业务运营/SOP和运营手册",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "operations_manual",
+            "source_name": "operations_manual.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: operations_manual.md"
+          },
+          {
+            "artifact": "sop_template",
+            "source_name": "sop_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: sop_template.md"
+          },
+          {
+            "artifact": "responsibility_matrix",
+            "source_name": "responsibility_matrix.tsv",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: responsibility_matrix.tsv"
+          },
+          {
+            "artifact": "rollout_checklist",
+            "source_name": "rollout_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollout_checklist.md"
+          },
+          {
+            "artifact": "maintenance_policy",
+            "source_name": "maintenance_policy.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_policy.md"
+          },
+          {
+            "artifact": "coverage_report",
+            "source_name": "coverage_report.txt",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage_report.txt"
+          }
+        ],
+        "failure_modes": [
+          "Manual is aspirational rather than operational.",
+          "SOP template omits ownership, escalation, or maintenance sections.",
+          "Responsibility matrix is not tabular or has inconsistent columns.",
+          "Artifacts contradict team size or workflow count.",
+          "Creates unverifiable claims about past operations or customer cases."
+        ],
+        "validation_metric": "ripgrep finds 100% required sections and mawk reports zero malformed TSV rows",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Create a ready-to-adopt SOP and operations manual system from only business type, team size, number of processes, and tool preference: manual structure, SOP template, role/responsibility matrix, rollout plan, exception process, and review cadence. 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "operations_manual",
+        "sop_template",
+        "responsibility_matrix",
+        "rollout_checklist",
+        "maintenance_policy",
+        "coverage_report"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_013_b4e54473",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_200db1a6dc",
+      "title": "审批流程模板生成器的 Bash 落地脚本种子",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_013_b4e54473",
+        "source_task_id": "searchagent-search_seed_200db1a6dc",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "审批流程模板生成器的 Bash 落地脚本种子",
+        "subdomain": "办公自动化/审批和请求流程",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "approval_flow",
+            "source_name": "approval_flow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: approval_flow.md"
+          },
+          {
+            "artifact": "request_form_template",
+            "source_name": "request_form_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: request_form_template.md"
+          },
+          {
+            "artifact": "permission_matrix",
+            "source_name": "permission_matrix.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: permission_matrix.md"
+          },
+          {
+            "artifact": "runbook",
+            "source_name": "runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: runbook.md"
+          },
+          {
+            "artifact": "init_approval_templates",
+            "source_name": "init_approval_templates.sh",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: init_approval_templates.sh"
+          }
+        ],
+        "failure_modes": [
+          "只给原则不产出可直接使用的模板。",
+          "审批角色和权限矩阵不一致。",
+          "脚本含未引用变量、不可移植 shebang 或危险覆盖逻辑。",
+          "引入禁止材料或假设存在历史数据。"
+        ],
+        "validation_metric": "ShellCheck 通过且至少生成 4 类审批流程核心文档。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 仅基于请求类型、审批层级、团队规模和工具，生成可落地的审批流程、请求表单模板、权限矩阵和维护机制，并提供一个可执行脚本把模板目录初始化出来。 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "approval_flow",
+        "request_form_template",
+        "permission_matrix",
+        "runbook",
+        "init_approval_templates"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_014_4b9b0388",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_7131c849a3",
+      "title": "技术文档贡献规范 Python 生成器种子",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_014_4b9b0388",
+        "source_task_id": "searchagent-search_seed_7131c849a3",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "技术文档贡献规范 Python 生成器种子",
+        "subdomain": "编码开发/技术文档和贡献规范",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "doc_style_guide",
+            "source_name": "doc_style_guide.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: doc_style_guide.md"
+          },
+          {
+            "artifact": "doc_review_checklist",
+            "source_name": "doc_review_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: doc_review_checklist.md"
+          },
+          {
+            "artifact": "readme_template",
+            "source_name": "README_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: README_template.md"
+          },
+          {
+            "artifact": "contribution_workflow",
+            "source_name": "contribution_workflow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: contribution_workflow.md"
+          },
+          {
+            "artifact": "generate_docs",
+            "source_name": "generate_docs.py",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: generate_docs.py"
+          }
+        ],
+        "failure_modes": [
+          "README 模板过泛，缺少安装、使用、贡献、发布节奏章节。",
+          "评审清单不可操作或没有责任人。",
+          "Python 脚本硬编码私人路径或输出不稳定。",
+          "pylint 出现明显错误但未修复。"
+        ],
+        "validation_metric": "Pylint 无致命错误且生成不少于 4 个可用 Markdown 产物。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 仅基于项目类型、读者角色、文档平台和发布节奏，生成技术文档和贡献规范落地材料，并提供 Python 脚本批量输出标准化 Markdown 模板。 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "doc_style_guide",
+        "doc_review_checklist",
+        "readme_template",
+        "contribution_workflow",
+        "generate_docs"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_015_95ce1314",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_39e6e7561e",
+      "title": "sample numerical toolkit native-kernel static analysis triage",
+      "selected_tools": [
+        "cppcheck",
+        "diffstat"
+      ],
+      "materials": {
+        "task_id": "tool_seed_015_95ce1314",
+        "source_task_id": "searchagent-search_seed_39e6e7561e",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit native-kernel static analysis triage",
+        "subdomain": "computing_math/scientific_python_native_extensions",
+        "selected_tools": [
+          "cppcheck",
+          "diffstat"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "cppcheck_findings_summary",
+            "source_name": "cppcheck findings summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: cppcheck findings summary"
+          },
+          {
+            "artifact": "risk_ranked_issue_table",
+            "source_name": "risk-ranked issue table",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk-ranked issue table"
+          },
+          {
+            "artifact": "minimal_patch_impact_diffstat_summary",
+            "source_name": "minimal patch-impact diffstat summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: minimal patch-impact diffstat summary"
+          },
+          {
+            "artifact": "release_blocker_checklist",
+            "source_name": "release-blocker checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release-blocker checklist"
+          }
+        ],
+        "failure_modes": [
+          "Treating all cppcheck warnings as release blockers",
+          "Ignoring numerical-code context such as intentional low-level memory patterns",
+          "Reporting raw tool output without triage",
+          "Claiming fixes were validated without evidence"
+        ],
+        "validation_metric": "At least 90% of reported high-severity findings include location, rationale, proposed fix, and release-blocker decision.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Before a minor release, identify high-risk C/C++ issues in sample numerical toolkit native kernels and produce a prioritized remediation plan without relying on historical logs or private datasets. 候选工具: cppcheck, diffstat. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "cppcheck_findings_summary",
+        "risk_ranked_issue_table",
+        "minimal_patch_impact_diffstat_summary",
+        "release_blocker_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_016_ff919733",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_cd8a008ba1",
+      "title": "sample numerical toolkit solver coverage gap assessment",
+      "selected_tools": [
+        "gcovr"
+      ],
+      "materials": {
+        "task_id": "tool_seed_016_ff919733",
+        "source_task_id": "searchagent-search_seed_cd8a008ba1",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit solver coverage gap assessment",
+        "subdomain": "computing_math/numerical_solver_testing",
+        "selected_tools": [
+          "gcovr"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "coverage_baseline_report",
+            "source_name": "coverage baseline report",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage baseline report"
+          },
+          {
+            "artifact": "uncovered_branch_hotspot_list",
+            "source_name": "uncovered-branch hotspot list",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: uncovered-branch hotspot list"
+          },
+          {
+            "artifact": "test_prioritization_matrix",
+            "source_name": "test-prioritization matrix",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: test-prioritization matrix"
+          },
+          {
+            "artifact": "coverage_acceptance_gate_proposal",
+            "source_name": "coverage acceptance gate proposal",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage acceptance gate proposal"
+          }
+        ],
+        "failure_modes": [
+          "Equating high coverage with numerical correctness",
+          "Ignoring generated or vendored files in coverage interpretation",
+          "Setting unrealistic blanket coverage gates",
+          "Failing to prioritize boundary-condition branches"
+        ],
+        "validation_metric": "Coverage plan defines baseline percentage, excluded paths rationale, top 5 uncovered hotspots, and at least 3 targeted test ideas.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Establish an initial coverage baseline for sample numerical toolkit solver tests and identify untested numerical branches that need targeted regression tests before refactoring. 候选工具: gcovr. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "coverage_baseline_report",
+        "uncovered_branch_hotspot_list",
+        "test_prioritization_matrix",
+        "coverage_acceptance_gate_proposal"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_017_2cd06fec",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_0867e7f4fd",
+      "title": "AI使用治理政策与审批流程YAML化种子",
+      "selected_tools": [
+        "node-js-yaml"
+      ],
+      "materials": {
+        "task_id": "tool_seed_017_2cd06fec",
+        "source_task_id": "searchagent-search_seed_0867e7f4fd",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "AI使用治理政策与审批流程YAML化种子",
+        "subdomain": "IT与安全/AI使用治理",
+        "selected_tools": [
+          "node-js-yaml"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "policy",
+            "source_name": "policy.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: policy.md"
+          },
+          {
+            "artifact": "approval_workflow",
+            "source_name": "approval_workflow.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: approval_workflow.yaml"
+          },
+          {
+            "artifact": "risk_checklist",
+            "source_name": "risk_checklist.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_checklist.yaml"
+          },
+          {
+            "artifact": "maintenance_playbook",
+            "source_name": "maintenance_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintenance_playbook.md"
+          }
+        ],
+        "failure_modes": [
+          "把模板写成泛泛原则而缺少可执行审批步骤",
+          "输出YAML语法错误或字段不可维护",
+          "要求用户上传敏感材料进行判断",
+          "未覆盖高敏数据、第三方工具、例外审批场景"
+        ],
+        "validation_metric": "YAML解析通过率=100%，且政策、审批、清单、维护四类产物均包含角色、触发条件、输出物和复审周期。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不提供历史文件、真实客户数据、权限导出或审计日志的情况下，仅基于公司规模、允许工具、数据敏感等级、审批角色，生成可落地的AI使用政策、工具审批流程、风险检查清单和维护节奏。 候选工具: node-js-yaml. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "policy",
+        "approval_workflow",
+        "risk_checklist",
+        "maintenance_playbook"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_018_c029d98c",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_dd41e36d47",
+      "title": "数据访问治理门户压测与访问流程种子",
+      "selected_tools": [
+        "apache2-utils",
+        "nginx"
+      ],
+      "materials": {
+        "task_id": "tool_seed_018_c029d98c",
+        "source_task_id": "searchagent-search_seed_dd41e36d47",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "数据访问治理门户压测与访问流程种子",
+        "subdomain": "数据与BI/数据访问和治理",
+        "selected_tools": [
+          "apache2-utils",
+          "nginx"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "data_access_policy",
+            "source_name": "data_access_policy.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: data_access_policy.md"
+          },
+          {
+            "artifact": "role_matrix",
+            "source_name": "role_matrix.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: role_matrix.md"
+          },
+          {
+            "artifact": "request_flow",
+            "source_name": "request_flow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: request_flow.md"
+          },
+          {
+            "artifact": "nginx_static_portal",
+            "source_name": "nginx_static_portal.conf",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: nginx_static_portal.conf"
+          },
+          {
+            "artifact": "ab_validation_notes",
+            "source_name": "ab_validation_notes.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ab_validation_notes.md"
+          }
+        ],
+        "failure_modes": [
+          "把性能测试结果伪造成真实线上数据",
+          "要求上传历史日志、权限导出或客户数据",
+          "nginx配置缺少最小安全头或路径边界",
+          "访问治理仅有原则无申请/审批/复核闭环"
+        ],
+        "validation_metric": "产物完整度≥90%；nginx配置语法可检查通过；ab验证方案包含本地目标、并发参数、成功率阈值和结果记录模板。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不提供原始文件、真实客户数据、日志或权限导出的情况下，仅基于数据类型、访问角色、合规要求、审批层级，生成数据访问政策、治理角色矩阵、分析请求流程，并用本地nginx与apache2-utils设计轻量验证步骤。 候选工具: apache2-utils, nginx. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "data_access_policy",
+        "role_matrix",
+        "request_flow",
+        "nginx_static_portal",
+        "ab_validation_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_019_2486b450",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_7898c9ffe7",
+      "title": "sample numerical toolkit_seed_sqlite_ai_usage_governance_kit",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_019_2486b450",
+        "source_task_id": "searchagent-search_seed_7898c9ffe7",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit_seed_sqlite_ai_usage_governance_kit",
+        "subdomain": "IT与安全 / AI 使用治理 / 流程与台账模板",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "ai_usage_policy",
+            "source_name": "ai_usage_policy.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ai_usage_policy.md"
+          },
+          {
+            "artifact": "tool_approval_flow",
+            "source_name": "tool_approval_flow.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: tool_approval_flow.md"
+          },
+          {
+            "artifact": "risk_checklist",
+            "source_name": "risk_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_checklist.md"
+          },
+          {
+            "artifact": "governance_runbook",
+            "source_name": "governance_runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: governance_runbook.md"
+          },
+          {
+            "artifact": "governance_schema",
+            "source_name": "governance_schema.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: governance_schema.sql"
+          },
+          {
+            "artifact": "sample_governance",
+            "source_name": "sample_governance.db",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: sample_governance.db"
+          },
+          {
+            "artifact": "validation_queries",
+            "source_name": "validation_queries.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_queries.sql"
+          }
+        ],
+        "failure_modes": [
+          "产物只给原则性建议，没有流程、角色、表单和台账结构。",
+          "SQLite 文件或 SQL 无法执行，表关系无法支持审批与风险复审查询。",
+          "混入真实数据需求，要求上传日志、员工清单或历史审批记录。",
+          "未覆盖异常处理、复发预防或定期维护。",
+          "使用了 sqlite3 以外的计划外工具。"
+        ],
+        "validation_metric": "sqlite3 执行 schema 与示例查询成功率 100%；治理产物覆盖政策、审批、风险清单、异常处理、维护节奏 5 类核心材料；至少 8 条可查询控制项。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不依赖历史文件、客户数据、日志、截图、邮件或员工名单的情况下，生成可落地的 AI 使用政策、工具审批流程、风险检查清单、异常处理与维护流程，并用 sqlite3 形成可查询的治理台账原型。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "ai_usage_policy",
+        "tool_approval_flow",
+        "risk_checklist",
+        "governance_runbook",
+        "governance_schema",
+        "sample_governance",
+        "validation_queries"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 7,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_020_5039e1ec",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_70c09ee5df",
+      "title": "sample numerical toolkit_seed_jq_ux_research_process_pack",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_020_5039e1ec",
+        "source_task_id": "searchagent-search_seed_70c09ee5df",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit_seed_jq_ux_research_process_pack",
+        "subdomain": "产品与设计 / 用户研究流程 / 结构化计划校验",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "research_plan",
+            "source_name": "research_plan.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: research_plan.json"
+          },
+          {
+            "artifact": "interview_script",
+            "source_name": "interview_script.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: interview_script.md"
+          },
+          {
+            "artifact": "usability_test_plan",
+            "source_name": "usability_test_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: usability_test_plan.md"
+          },
+          {
+            "artifact": "participant_screening",
+            "source_name": "participant_screening.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: participant_screening.md"
+          },
+          {
+            "artifact": "archive_structure",
+            "source_name": "archive_structure.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: archive_structure.md"
+          },
+          {
+            "artifact": "synthesis_template",
+            "source_name": "synthesis_template.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: synthesis_template.md"
+          },
+          {
+            "artifact": "jq_validation_filters",
+            "source_name": "jq_validation_filters.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: jq_validation_filters.md"
+          }
+        ],
+        "failure_modes": [
+          "研究流程泛泛而谈，缺少可执行脚本、测试任务、招募标准或归档结构。",
+          "JSON 结构不可被 jq 解析，或校验过滤器无法运行。",
+          "把研究结论写成已知事实，伪造用户反馈或历史数据。",
+          "未覆盖时间受限情况下的取舍、异常处理和复盘维护。",
+          "使用了 jq 以外的计划外工具。"
+        ],
+        "validation_metric": "jq 能成功解析 research_plan.json 并通过必填字段校验；研究流程覆盖访谈脚本、可用性测试计划、筛选/同意、归档、复盘 5 类材料；至少 6 个测试任务或问题模块可追踪到研究目标。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在没有现成流程和原始材料的前提下，生成访谈脚本、可用性测试计划、招募与同意说明、研究归档结构和复盘模板，并用 jq 校验 JSON 化研究计划是否覆盖关键字段。 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "research_plan",
+        "interview_script",
+        "usability_test_plan",
+        "participant_screening",
+        "archive_structure",
+        "synthesis_template",
+        "jq_validation_filters"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 7,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_021_89105caf",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_54fd1b67b5",
+      "title": "Python/sample numerical toolkit release failure triage from verbal symptoms",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_021_89105caf",
+        "source_task_id": "searchagent-search_seed_54fd1b67b5",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Python/sample numerical toolkit release failure triage from verbal symptoms",
+        "subdomain": "coding_dev.release_failure_rollback.sample_numerical_toolkit",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "diagnostic_report",
+            "source_name": "diagnostic_report.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: diagnostic_report.md"
+          },
+          {
+            "artifact": "triage_decision_tree",
+            "source_name": "triage_decision_tree.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: triage_decision_tree.md"
+          },
+          {
+            "artifact": "rollback_and_verification_plan",
+            "source_name": "rollback_and_verification_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback_and_verification_plan.md"
+          },
+          {
+            "artifact": "release_hardening_checklist",
+            "source_name": "release_hardening_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release_hardening_checklist.md"
+          },
+          {
+            "artifact": "optional_rg_mawk_command_snippets",
+            "source_name": "optional_rg_mawk_command_snippets.sh",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: optional_rg_mawk_command_snippets.sh"
+          }
+        ],
+        "failure_modes": [
+          "Treating the verbal prompt as if logs or PR diffs were available",
+          "Giving generic release advice without Python packaging/sample numerical toolkit-specific branches",
+          "Skipping rollback safety checks and post-release verification",
+          "Using tools outside the allowed group",
+          "Overfitting to GitHub Actions only and ignoring package-manager/environment causes"
+        ],
+        "validation_metric": "A reviewer can map every recommendation to an oral input or an explicitly marked assumption, and the output contains at least one executable decision path for diagnose, rollback, verify, and prevent recurrence.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Given only a spoken description of language, package manager, release frequency, and deployment environment, guide the maintainer through diagnosing a failed Python/sample numerical toolkit release and rollback risk; produce a release-failure diagnostic report, decision tree, rollback/verification plan, and recurrence-prevention checklist without relying on private logs or historical files. 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "diagnostic_report",
+        "triage_decision_tree",
+        "rollback_and_verification_plan",
+        "release_hardening_checklist",
+        "optional_rg_mawk_command_snippets"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_022_f6473476",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_bc6fe56e2c",
+      "title": "Python/sample numerical toolkit shell release script guardrail review",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_022_f6473476",
+        "source_task_id": "searchagent-search_seed_bc6fe56e2c",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Python/sample numerical toolkit shell release script guardrail review",
+        "subdomain": "coding_dev.release_automation.shell_guardrails.sample_numerical_toolkit",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "shell_release_risk_report",
+            "source_name": "shell_release_risk_report.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shell_release_risk_report.md"
+          },
+          {
+            "artifact": "shellcheck_review_plan",
+            "source_name": "shellcheck_review_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shellcheck_review_plan.md"
+          },
+          {
+            "artifact": "prioritized_fix_backlog",
+            "source_name": "prioritized_fix_backlog.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: prioritized_fix_backlog.md"
+          },
+          {
+            "artifact": "validation_runbook",
+            "source_name": "validation_runbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_runbook.md"
+          },
+          {
+            "artifact": "pre_release_gate_checklist",
+            "source_name": "pre_release_gate_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: pre_release_gate_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "Running or assuming access to real shell scripts despite forbidden materials",
+          "Producing only ShellCheck command syntax without a remediation workflow",
+          "Ignoring Python package release semantics",
+          "Using ripgrep, mawk, jq, sqlite3, or other unselected tools",
+          "Failing to distinguish lint findings from confirmed root causes"
+        ],
+        "validation_metric": "Output is acceptable if it yields a ShellCheck-centered review plan with prioritized risk categories, clear assumptions, rollback-safe validation gates, and no claims based on unavailable files.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: From a verbal account of release commands, package manager, deploy environment, and failure timing, create a practical shell-script review and remediation plan for Python/sample numerical toolkit release automation, including a lint-focused risk report, prioritized fixes, validation steps, and prevention checklist. 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "shell_release_risk_report",
+        "shellcheck_review_plan",
+        "prioritized_fix_backlog",
+        "validation_runbook",
+        "pre_release_gate_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_023_c7ba2d94",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_2d296e124c",
+      "title": "sample numerical toolkit: 数据访问治理模式选型助手代码与输出质量种子",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_023_c7ba2d94",
+        "source_task_id": "searchagent-search_seed_2d296e124c",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: 数据访问治理模式选型助手代码与输出质量种子",
+        "subdomain": "数据与BI/数据访问治理模式",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "python",
+            "source_name": "Python规则打分脚本",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: Python规则打分脚本"
+          },
+          {
+            "artifact": "json",
+            "source_name": "示例约束输入JSON",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 示例约束输入JSON"
+          },
+          {
+            "artifact": "markdown",
+            "source_name": "治理模式对比矩阵Markdown",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 治理模式对比矩阵Markdown"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "推荐说明模板",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 推荐说明模板"
+          }
+        ],
+        "failure_modes": [
+          "把任务做成通用治理文章而非选型决策",
+          "引用或要求真实客户数据/日志/历史文件",
+          "评分规则硬编码且无法解释",
+          "缺少回退路径或例外场景",
+          "pylint存在明显错误但未处理"
+        ],
+        "validation_metric": "pylint无致命错误；样例输入可生成包含不少于3种治理模式、5个评估维度、明确推荐与至少3条风险缓解的Markdown结果。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不使用历史文件、真实客户数据、日志或CSV的前提下，基于数据规模、用户规模、合规要求、实时性要求，产出评估维度、治理模式对比矩阵、推荐方案、风险说明与回退路径。 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "python",
+        "json",
+        "markdown",
+        "artifact_4"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_024_8f0b1e4d",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_6423d7e1ef",
+      "title": "sample numerical toolkit: AI工具准入策略变更审查种子",
+      "selected_tools": [
+        "cppcheck",
+        "diffstat"
+      ],
+      "materials": {
+        "task_id": "tool_seed_024_8f0b1e4d",
+        "source_task_id": "searchagent-search_seed_6423d7e1ef",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: AI工具准入策略变更审查种子",
+        "subdomain": "IT与安全/AI工具准入策略",
+        "selected_tools": [
+          "cppcheck",
+          "diffstat"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "c",
+            "source_name": "C++策略判断模块补丁",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: C++策略判断模块补丁"
+          },
+          {
+            "artifact": "markdown",
+            "source_name": "策略候选说明Markdown",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 策略候选说明Markdown"
+          },
+          {
+            "artifact": "artifact_3",
+            "source_name": "例外规则表",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 例外规则表"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "合成输入用例",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 合成输入用例"
+          }
+        ],
+        "failure_modes": [
+          "只给原则口号，没有可执行准入矩阵",
+          "例外规则过宽导致绕过默认禁止",
+          "补丁范围异常膨胀或夹带无关重构",
+          "cppcheck发现严重缺陷仍声称通过",
+          "推荐策略未说明风险与回退"
+        ],
+        "validation_metric": "diffstat显示核心代码与文档变更范围可解释；cppcheck无error级问题；输出包含至少4个评估维度、3类工具候选、默认策略、例外流程和回退方案。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在不使用员工名单、审计日志、权限导出、聊天记录或邮件正文的前提下，基于公司规模、合规要求、数据类型、工具偏好，产出准入评估维度、工具候选对比、推荐策略、例外规则、风险与回退路径。 候选工具: cppcheck, diffstat. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "c",
+        "markdown",
+        "artifact_3",
+        "artifact_4"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_025_9138d4e8",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_1678bc5870",
+      "title": "Python sample numerical toolkit coverage-gated contributor guide seed",
+      "selected_tools": [
+        "gcovr"
+      ],
+      "materials": {
+        "task_id": "tool_seed_025_9138d4e8",
+        "source_task_id": "searchagent-search_seed_1678bc5870",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Python sample numerical toolkit coverage-gated contributor guide seed",
+        "subdomain": "coding_development_contribution_guide",
+        "selected_tools": [
+          "gcovr"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "contributing",
+            "source_name": "CONTRIBUTING.md draft",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: CONTRIBUTING.md draft"
+          },
+          {
+            "artifact": "quickstart_contributing",
+            "source_name": "QUICKSTART_CONTRIBUTING.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: QUICKSTART_CONTRIBUTING.md"
+          },
+          {
+            "artifact": "maintainer_review_checklist",
+            "source_name": "maintainer_review_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: maintainer_review_checklist.md"
+          },
+          {
+            "artifact": "coverage_policy_snippet",
+            "source_name": "coverage_policy_snippet.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage_policy_snippet.md"
+          }
+        ],
+        "failure_modes": [
+          "Invents repository-specific commands, directory names, or coverage thresholds not present in the brief.",
+          "Turns into a final SoftArena task package instead of a seed specification.",
+          "Ignores the requested multi-artifact structure or omits maintainer-facing guidance.",
+          "Uses tools outside the allowed selected_tools group."
+        ],
+        "validation_metric": "All four requested documentation artifacts are specified, include gcovr-based coverage guidance, and contain no claims requiring access to forbidden existing code or logs.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Create a contribution guide from an oral brief only: target audience is new Python contributors, stack is Python with pytest-style tests and coverage reporting, tone is practical and welcoming, length is concise but complete. Deliver a main guide, quick-start version, review checklist, and maintenance notes without using an existing repository, PR diff, logs, or historical files. 候选工具: gcovr. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "contributing",
+        "quickstart_contributing",
+        "maintainer_review_checklist",
+        "coverage_policy_snippet"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_026_9d61e458",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c61593fb3c",
+      "title": "Python sample numerical toolkit shared inbox response templates with benchmark-aware escalation seed",
+      "selected_tools": [
+        "apache2-utils",
+        "nginx"
+      ],
+      "materials": {
+        "task_id": "tool_seed_026_9d61e458",
+        "source_task_id": "searchagent-search_seed_c61593fb3c",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Python sample numerical toolkit shared inbox response templates with benchmark-aware escalation seed",
+        "subdomain": "office_automation_shared_inbox_reply",
+        "selected_tools": [
+          "apache2-utils",
+          "nginx"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "shared_inbox_reply_master",
+            "source_name": "shared_inbox_reply_master.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shared_inbox_reply_master.md"
+          },
+          {
+            "artifact": "scenario_variants",
+            "source_name": "scenario_variants.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: scenario_variants.md"
+          },
+          {
+            "artifact": "escalation_playbook",
+            "source_name": "escalation_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: escalation_playbook.md"
+          },
+          {
+            "artifact": "response_quality_checklist",
+            "source_name": "response_quality_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: response_quality_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "Requests or fabricates real inbox messages, logs, CSVs, screenshots, or customer data.",
+          "Over-indexes on server administration instead of drafting reusable inbox replies.",
+          "Gives unsafe or unrealistic performance conclusions from nonexistent ab/nginx data.",
+          "Uses selected tools outside the nginx plus apache2-utils group."
+        ],
+        "validation_metric": "Seed specifies four reusable inbox artifacts, includes at least three scenario variants and clear escalation triggers, and stays within the nginx/apache2-utils tool group without requiring forbidden materials.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Draft shared inbox reply scripts from an oral brief only: audience is open-source users and contributors, service type is technical support triage, channel is shared email/helpdesk, tone is calm and professional. Produce a main reply script, scenario variants, escalation instructions, and QA checklist, with a variant for cases where maintainers request reproducible HTTP benchmark context. 候选工具: apache2-utils, nginx. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "shared_inbox_reply_master",
+        "scenario_variants",
+        "escalation_playbook",
+        "response_quality_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_027_f5b3a99d",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_2ae8d2756c",
+      "title": "YAML化API契约蓝图与兼容性检查种子",
+      "selected_tools": [
+        "node-js-yaml"
+      ],
+      "materials": {
+        "task_id": "tool_seed_027_f5b3a99d",
+        "source_task_id": "searchagent-search_seed_2ae8d2756c",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "YAML化API契约蓝图与兼容性检查种子",
+        "subdomain": "编码开发/API契约设计",
+        "selected_tools": [
+          "node-js-yaml"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "openapi_contract",
+            "source_name": "openapi_contract.yaml草案",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: openapi_contract.yaml草案"
+          },
+          {
+            "artifact": "error_model",
+            "source_name": "error_model.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: error_model.yaml"
+          },
+          {
+            "artifact": "versioning_compatibility_notes",
+            "source_name": "versioning_compatibility_notes.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: versioning_compatibility_notes.md"
+          },
+          {
+            "artifact": "api_acceptance_checklist",
+            "source_name": "api_acceptance_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: api_acceptance_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "YAML缩进或锚点错误导致无法解析",
+          "只写业务说明而缺少可执行契约结构",
+          "忽略认证失败、幂等、分页、限流等边界",
+          "版本策略与错误模型不一致"
+        ],
+        "validation_metric": "node-js-yaml可解析率=100%，且必需契约章节覆盖率>=90%",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于API类型、认证方式、团队规模、技术栈等口头约束，产出接口设计方案、错误模型、版本与兼容策略、验收清单，并覆盖边界情况与测试要点。 候选工具: node-js-yaml. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "openapi_contract",
+        "error_model",
+        "versioning_compatibility_notes",
+        "api_acceptance_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_028_63024c2d",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_25928d1a8a",
+      "title": "SQLite驱动的开发者入职计划依赖矩阵种子",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_028_63024c2d",
+        "source_task_id": "searchagent-search_seed_25928d1a8a",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "SQLite驱动的开发者入职计划依赖矩阵种子",
+        "subdomain": "编码开发/开发者入职计划",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "onboarding_plan",
+            "source_name": "onboarding_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: onboarding_plan.md"
+          },
+          {
+            "artifact": "milestones",
+            "source_name": "milestones.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: milestones.sql"
+          },
+          {
+            "artifact": "mentor_assignment",
+            "source_name": "mentor_assignment.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: mentor_assignment.sql"
+          },
+          {
+            "artifact": "checkpoint_matrix",
+            "source_name": "checkpoint_matrix.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: checkpoint_matrix.sql"
+          },
+          {
+            "artifact": "risk_change_log",
+            "source_name": "risk_change_log.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_change_log.md"
+          }
+        ],
+        "failure_modes": [
+          "只生成散文计划，缺少可查询结构化表",
+          "导师安排与团队规模约束冲突",
+          "检查点无验收标准或时间边界",
+          "依赖关系循环或关键学习路径缺失"
+        ],
+        "validation_metric": "sqlite3建表与样例查询成功率=100%，里程碑-导师-检查点关联完整率>=90%",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于团队规模、入职周期、工具、技术栈等口头输入，制定开发者入职阶段计划、学习路径、导师安排、检查点清单，并覆盖里程碑、依赖、风险与变更应对。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "onboarding_plan",
+        "milestones",
+        "mentor_assignment",
+        "checkpoint_matrix",
+        "risk_change_log"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_029_9bc79aa1",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_4db96effb4",
+      "title": "KPI dashboard metric-model design from verbal constraints using JSON contract checks",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_029_9bc79aa1",
+        "source_task_id": "searchagent-search_seed_4db96effb4",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "KPI dashboard metric-model design from verbal constraints using JSON contract checks",
+        "subdomain": "数据与BI/看板指标模型设计",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "json",
+            "source_name": "需求约束JSON草案",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 需求约束JSON草案"
+          },
+          {
+            "artifact": "json_schema",
+            "source_name": "指标模型JSON Schema式说明",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 指标模型JSON Schema式说明"
+          },
+          {
+            "artifact": "artifact_3",
+            "source_name": "看板页面结构清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 看板页面结构清单"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "权限与刷新策略表",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 权限与刷新策略表"
+          },
+          {
+            "artifact": "artifact_5",
+            "source_name": "验收清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 验收清单"
+          }
+        ],
+        "failure_modes": [
+          "直接写实现代码而非设计方案",
+          "引入真实历史文件、日志、CSV或客户数据",
+          "指标只列名称不定义口径/粒度/维度",
+          "忽略权限、刷新策略或验收标准",
+          "jq查询无法复现或与JSON结构不匹配"
+        ],
+        "validation_metric": "给定一份口头约束转写的JSON，最终方案中>=90%的指标有明确口径/粒度/维度/刷新策略/验收条件，且jq抽检查询能定位对应字段。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅有数据规模、用户规模、实时性要求和可用工具等口头约束下，设计一套看板指标模型方案，包含指标定义层级、维度/事实模型、看板结构、权限与刷新策略、验收清单、边界情况和测试要点。 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "json",
+        "json_schema",
+        "artifact_3",
+        "artifact_4",
+        "artifact_5"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_030_f798d7ff",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_4ccb38b6da",
+      "title": "Blameless production incident retrospective from narrated timeline with text evidence extraction",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_030_f798d7ff",
+        "source_task_id": "searchagent-search_seed_4ccb38b6da",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Blameless production incident retrospective from narrated timeline with text evidence extraction",
+        "subdomain": "IT与安全/生产事故复盘",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "artifact_1",
+            "source_name": "口述记录纯文本",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 口述记录纯文本"
+          },
+          {
+            "artifact": "artifact_2",
+            "source_name": "事件时间线表",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 事件时间线表"
+          },
+          {
+            "artifact": "artifact_3",
+            "source_name": "5 Whys/鱼骨式根因摘要",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 5 Whys/鱼骨式根因摘要"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "贡献因素矩阵",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 贡献因素矩阵"
+          },
+          {
+            "artifact": "raci",
+            "source_name": "改进项Owner/RACI清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 改进项Owner/RACI清单"
+          },
+          {
+            "artifact": "artifact_6",
+            "source_name": "预防机制与演练清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 预防机制与演练清单"
+          }
+        ],
+        "failure_modes": [
+          "要求用户上传日志、聊天记录或审计数据",
+          "把复盘写成追责报告",
+          "时间线缺少时间点、动作、影响和决策依据",
+          "改进项没有Owner、期限、验证方式",
+          "将症状误判为根因",
+          "ripgrep/mawk处理步骤与文本格式不一致"
+        ],
+        "validation_metric": "从口述文本抽取的关键事件覆盖率>=85%，每个P0/P1影响点至少关联一个根因或贡献因素，且每条改进项包含Owner角色、截止时间和验证信号。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅有事件类型、影响范围、处置经过和团队结构等口头信息下，完成一次生产事故复盘，产出事件时间线、根因分析、贡献因素、改进项、预防机制和后续追踪规则。 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "artifact_1",
+        "artifact_2",
+        "artifact_3",
+        "artifact_4",
+        "raci",
+        "artifact_6"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 6,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_031_7ed8a10f",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_0a55c2818a",
+      "title": "CI 流水线偶发失败的 Shell 脚本静态诊断种子",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_031_7ed8a10f",
+        "source_task_id": "searchagent-search_seed_0a55c2818a",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "CI 流水线偶发失败的 Shell 脚本静态诊断种子",
+        "subdomain": "编码开发/CI 流水线偶发失败",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "synthetic_ci_shell_scripts",
+            "source_name": "synthetic_ci_shell_scripts",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: synthetic_ci_shell_scripts"
+          },
+          {
+            "artifact": "shellcheck_findings_summary",
+            "source_name": "shellcheck_findings_summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shellcheck_findings_summary"
+          },
+          {
+            "artifact": "flaky_failure_decision_tree",
+            "source_name": "flaky_failure_decision_tree",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: flaky_failure_decision_tree"
+          },
+          {
+            "artifact": "stability_fix_plan",
+            "source_name": "stability_fix_plan",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: stability_fix_plan"
+          },
+          {
+            "artifact": "regression_checklist",
+            "source_name": "regression_checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: regression_checklist"
+          }
+        ],
+        "failure_modes": [
+          "把任务做成泛泛 CI 咨询而没有静态分析落点",
+          "要求用户上传日志、PR diff 或现有代码库",
+          "忽略偶发性与并发条件，仅给单次失败排查",
+          "误用未列入工具如 jq、ripgrep、sqlite3"
+        ],
+        "validation_metric": "合成脚本经 shellcheck 后至少暴露 4 类可解释问题，修复版 shellcheck 无 error 级问题，报告中的根因假设均有验证步骤。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅有口头现象描述的前提下，围绕 CI 流水线偶发失败，构造一个可执行排查种子：生成最小化示例 shell 脚本与 CI 片段，使用 shellcheck 定位未引用变量、临时目录竞争、set -e 误用、管道错误吞没等常见 flaky 根因，并产出流水线失败诊断报告、排查决策树、稳定性修复方案、复发监控建议。 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "synthetic_ci_shell_scripts",
+        "shellcheck_findings_summary",
+        "flaky_failure_decision_tree",
+        "stability_fix_plan",
+        "regression_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_032_3abaa1d8",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_4e543083b9",
+      "title": "用户登录间歇失败的 Python 认证代码静态诊断种子",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_032_3abaa1d8",
+        "source_task_id": "searchagent-search_seed_4e543083b9",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "用户登录间歇失败的 Python 认证代码静态诊断种子",
+        "subdomain": "编码开发/用户登录间歇失败",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "synthetic_python_auth_module",
+            "source_name": "synthetic_python_auth_module",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: synthetic_python_auth_module"
+          },
+          {
+            "artifact": "pylint_findings_summary",
+            "source_name": "pylint_findings_summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: pylint_findings_summary"
+          },
+          {
+            "artifact": "login_failure_decision_tree",
+            "source_name": "login_failure_decision_tree",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: login_failure_decision_tree"
+          },
+          {
+            "artifact": "fix_and_regression_plan",
+            "source_name": "fix_and_regression_plan",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: fix_and_regression_plan"
+          },
+          {
+            "artifact": "prevention_checklist",
+            "source_name": "prevention_checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: prevention_checklist"
+          }
+        ],
+        "failure_modes": [
+          "只列认证排查清单而没有 Python 静态诊断产物",
+          "把间歇失败归因于外部服务却没有本地可验证假设",
+          "要求用户提供错误日志或生产数据库",
+          "误用 shellcheck 或其他未选工具"
+        ],
+        "validation_metric": "合成 Python 模块经 pylint 后至少产生 5 个与稳定性或可维护性相关的诊断点，修复方案逐项闭环，回归清单覆盖成功、失败、过期、并发与配置缺失场景。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅有口头现象描述的前提下，围绕用户登录间歇失败，构造一个可执行排查种子：生成最小化 Python 认证模块样例，使用 pylint 发现会导致间歇失败的状态共享、异常吞没、时间处理、返回分支不一致、配置读取问题，并产出登录失败诊断报告、排查决策树、修复与回归方案、复发预防清单。 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "synthetic_python_auth_module",
+        "pylint_findings_summary",
+        "login_failure_decision_tree",
+        "fix_and_regression_plan",
+        "prevention_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_033_7746e14c",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_af21560a69",
+      "title": "generic diversity harness Python 绑定层内存安全与补丁影响审查",
+      "selected_tools": [
+        "cppcheck",
+        "diffstat"
+      ],
+      "materials": {
+        "task_id": "tool_seed_033_7746e14c",
+        "source_task_id": "searchagent-search_seed_af21560a69",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "generic diversity harness Python 绑定层内存安全与补丁影响审查",
+        "subdomain": "Python C/C++ 扩展静态质量审查",
+        "selected_tools": [
+          "cppcheck",
+          "diffstat"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "artifact_1",
+            "source_name": "静态分析执行记录",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 静态分析执行记录"
+          },
+          {
+            "artifact": "cppcheck",
+            "source_name": "cppcheck 告警分级表",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: cppcheck 告警分级表"
+          },
+          {
+            "artifact": "diffstat",
+            "source_name": "diffstat 补丁影响摘要",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: diffstat 补丁影响摘要"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "高风险文件清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 高风险文件清单"
+          },
+          {
+            "artifact": "artifact_5",
+            "source_name": "发布阻断/放行建议",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 发布阻断/放行建议"
+          }
+        ],
+        "failure_modes": [
+          "把 cppcheck 输出原样粘贴但没有优先级和修复路径",
+          "忽略 diffstat 中的大规模删除/重构导致风险判断失真",
+          "将 style 级别告警误判为发布阻断",
+          "没有考虑 Python C API 引用计数、错误返回路径和资源释放"
+        ],
+        "validation_metric": "高风险告警需给出文件/函数/原因/修复建议；diffstat 热点文件覆盖率达到主要改动文件的 90% 以上；最终结论包含明确阻断项与非阻断项。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 团队准备合入一组 generic diversity harness Python 绑定和底层 C/C++ 数值内核改动，希望在不依赖完整人工代码走读的情况下，用静态分析和补丁统计快速识别潜在内存泄漏、越界、未初始化变量、异常路径资源释放遗漏，并形成可执行的修复清单。 候选工具: cppcheck, diffstat. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "artifact_1",
+        "cppcheck",
+        "diffstat",
+        "artifact_4",
+        "artifact_5"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_034_c34a3d66",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c96e2d695d",
+      "title": "generic diversity harness 数值内核测试覆盖率缺口定位",
+      "selected_tools": [
+        "gcovr"
+      ],
+      "materials": {
+        "task_id": "tool_seed_034_c34a3d66",
+        "source_task_id": "searchagent-search_seed_c96e2d695d",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "generic diversity harness 数值内核测试覆盖率缺口定位",
+        "subdomain": "科学计算库覆盖率与回归测试治理",
+        "selected_tools": [
+          "gcovr"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "gcovr",
+            "source_name": "gcovr 覆盖率报告",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: gcovr 覆盖率报告"
+          },
+          {
+            "artifact": "artifact_2",
+            "source_name": "文件/函数/分支覆盖率缺口表",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 文件/函数/分支覆盖率缺口表"
+          },
+          {
+            "artifact": "artifact_3",
+            "source_name": "关键未覆盖路径说明",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 关键未覆盖路径说明"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "补充测试用例设计",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 补充测试用例设计"
+          },
+          {
+            "artifact": "ci",
+            "source_name": "CI 覆盖率门禁建议",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: CI 覆盖率门禁建议"
+          }
+        ],
+        "failure_modes": [
+          "只报告总体覆盖率百分比，没有指出关键文件和分支缺口",
+          "忽略 Python 测试是否真正调用到底层 C/C++ 覆盖率插桩代码",
+          "把覆盖率低等同于必然有 bug，缺少风险分级",
+          "提出大量泛泛测试而非针对未覆盖分支的最小用例"
+        ],
+        "validation_metric": "报告需包含总体与关键目录覆盖率、Top 未覆盖文件、至少 5 个具体补充测试建议；CI 门禁建议包含当前基线、短期目标和例外处理规则。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 项目近期修复了若干数值求解器边界问题，但 CI 只显示测试通过，无法判断关键 C/C++ 路径是否被覆盖。希望用覆盖率工具生成报告，定位未覆盖的核心分支，提出最小补充测试方案，避免边界条件和异常路径在后续版本中再次回归。 候选工具: gcovr. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "gcovr",
+        "artifact_2",
+        "artifact_3",
+        "artifact_4",
+        "ci"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_035_1e3847f6",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_f835bc8aec",
+      "title": "Synthetic search relevance triage with reproducible HTTP benchmark harness",
+      "selected_tools": [
+        "apache2-utils",
+        "nginx"
+      ],
+      "materials": {
+        "task_id": "tool_seed_035_1e3847f6",
+        "source_task_id": "searchagent-search_seed_f835bc8aec",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Synthetic search relevance triage with reproducible HTTP benchmark harness",
+        "subdomain": "数据与BI/搜索结果相关性变差",
+        "selected_tools": [
+          "apache2-utils",
+          "nginx"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "relevance_diagnosis",
+            "source_name": "relevance_diagnosis.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: relevance_diagnosis.md"
+          },
+          {
+            "artifact": "decision_tree",
+            "source_name": "decision_tree.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: decision_tree.md"
+          },
+          {
+            "artifact": "synthetic_queries",
+            "source_name": "synthetic_queries.jsonl",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: synthetic_queries.jsonl"
+          },
+          {
+            "artifact": "nginx_search_fixture",
+            "source_name": "nginx_search_fixture.conf",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: nginx_search_fixture.conf"
+          },
+          {
+            "artifact": "ab_benchmark_commands",
+            "source_name": "ab_benchmark_commands.sh",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ab_benchmark_commands.sh"
+          },
+          {
+            "artifact": "recurrence_checklist",
+            "source_name": "recurrence_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: recurrence_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "把相关性变差直接归因于性能而缺少召回/排序诊断",
+          "要求用户上传日志或真实查询数据",
+          "ab 结果只报告 QPS 不解释对相关性的边界意义",
+          "nginx 配置不可启动或端口/路径说明缺失"
+        ],
+        "validation_metric": "nginx -t passes for generated config; ab command is syntactically plausible; markdown contains diagnosis matrix, decision tree, recall/ranking checks, recurrence checklist",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 需要把“搜索结果相关性变差”转化为可执行排查方案：产出相关性诊断报告、召回与排序核查决策树、合成查询集验证方案、复发评估建议，并用本地 nginx 暴露一个可压测的模拟搜索端点来区分相关性问题与服务性能问题。 候选工具: apache2-utils, nginx. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "relevance_diagnosis",
+        "decision_tree",
+        "synthetic_queries",
+        "nginx_search_fixture",
+        "ab_benchmark_commands",
+        "recurrence_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_036_8a3ab02f",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_639d50b114",
+      "title": "Message queue selection decision pack encoded as YAML",
+      "selected_tools": [
+        "node-js-yaml"
+      ],
+      "materials": {
+        "task_id": "tool_seed_036_8a3ab02f",
+        "source_task_id": "searchagent-search_seed_639d50b114",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Message queue selection decision pack encoded as YAML",
+        "subdomain": "编码开发/消息队列选型",
+        "selected_tools": [
+          "node-js-yaml"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "mq_selection",
+            "source_name": "mq_selection.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: mq_selection.yaml"
+          },
+          {
+            "artifact": "mq_selection_report",
+            "source_name": "mq_selection_report.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: mq_selection_report.md"
+          },
+          {
+            "artifact": "migration_rollout_plan",
+            "source_name": "migration_rollout_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: migration_rollout_plan.md"
+          },
+          {
+            "artifact": "rollback_playbook",
+            "source_name": "rollback_playbook.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback_playbook.md"
+          },
+          {
+            "artifact": "review_questions",
+            "source_name": "review_questions.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: review_questions.md"
+          }
+        ],
+        "failure_modes": [
+          "YAML 缩进错误或包含不可解析标记",
+          "只给单一推荐没有候选对比矩阵",
+          "忽略团队运维能力和回退路径",
+          "把工具用成真实环境部署或要求生产指标文件"
+        ],
+        "validation_metric": "node-js-yaml successfully parses mq_selection.yaml; required top-level keys present; weighted recommendation matches report rationale",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在没有历史文件和现有代码库的情况下，完成消息队列选型评估：产出评估维度、候选对比矩阵、推荐结论、风险、落地计划与回退路径，并将关键决策结构化为可被 node-js-yaml 解析的 YAML，便于团队评审复用。 候选工具: node-js-yaml. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "mq_selection",
+        "mq_selection_report",
+        "migration_rollout_plan",
+        "rollback_playbook",
+        "review_questions"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_037_829879cc",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_de8a8362ce",
+      "title": "SQLite-backed主数据库选型决策矩阵种子",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_037_829879cc",
+        "source_task_id": "searchagent-search_seed_de8a8362ce",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "SQLite-backed主数据库选型决策矩阵种子",
+        "subdomain": "编码开发/主数据库选型",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "decision_brief",
+            "source_name": "decision_brief.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: decision_brief.md"
+          },
+          {
+            "artifact": "schema",
+            "source_name": "schema.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: schema.sql"
+          },
+          {
+            "artifact": "candidate_scores",
+            "source_name": "candidate_scores.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: candidate_scores.sql"
+          },
+          {
+            "artifact": "recommendation_queries",
+            "source_name": "recommendation_queries.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: recommendation_queries.sql"
+          },
+          {
+            "artifact": "rollback_plan",
+            "source_name": "rollback_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback_plan.md"
+          }
+        ],
+        "failure_modes": [
+          "只写自然语言报告，没有可执行SQLite结构或查询。",
+          "评分维度与用户输入约束脱节，例如忽略一致性或团队熟悉度。",
+          "推荐结论没有风险、前提条件或回退路径。",
+          "SQL脚本不可重复执行，表结构缺失或查询无法返回排序结果。"
+        ],
+        "validation_metric": "sqlite3执行全部SQL无错误；候选方案不少于4个、评估维度不少于6个；最终推荐候选在加权总分查询中排名第1且报告中解释至少3个关键权衡。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅凭口头背景与约束的前提下，根据数据模型特征、读写规模、一致性要求、团队熟悉度，产出可复盘的主数据库选型评估维度、候选对比矩阵、推荐结论、迁移步骤与回退路径，并能用本地结构化表保存和查询决策依据。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "decision_brief",
+        "schema",
+        "candidate_scores",
+        "recommendation_queries",
+        "rollback_plan"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_038_620d4bee",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_868c836816",
+      "title": "jq驱动的云厂商与区域选型JSON决策包种子",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_038_620d4bee",
+        "source_task_id": "searchagent-search_seed_868c836816",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "jq驱动的云厂商与区域选型JSON决策包种子",
+        "subdomain": "IT与安全/云厂商与区域选型",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "requirements",
+            "source_name": "requirements.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: requirements.json"
+          },
+          {
+            "artifact": "candidates",
+            "source_name": "candidates.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: candidates.json"
+          },
+          {
+            "artifact": "scoring_model",
+            "source_name": "scoring_model.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: scoring_model.json"
+          },
+          {
+            "artifact": "jq_filters",
+            "source_name": "jq_filters.sh",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: jq_filters.sh"
+          },
+          {
+            "artifact": "decision_summary",
+            "source_name": "decision_summary.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: decision_summary.md"
+          },
+          {
+            "artifact": "dr_drill_checklist",
+            "source_name": "dr_drill_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: dr_drill_checklist.md"
+          }
+        ],
+        "failure_modes": [
+          "JSON不可被jq解析，或过滤器依赖不存在字段。",
+          "把云厂商选型写成通用模板，未体现地域、合规、成本和团队技能约束。",
+          "只比较品牌优劣，没有区域级别决策和容灾方案。",
+          "推荐结果与jq计算排序不一致，或没有说明被淘汰候选的原因。"
+        ],
+        "validation_metric": "jq能够解析全部JSON并执行筛选排序；至少3个候选厂商区域组合、5个评分维度、2条硬性淘汰规则；Markdown推荐与jq输出第一名一致并包含迁移和容灾路径。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 在仅凭业务地域、合规要求、成本预算、团队技能等口头约束的前提下，完成云厂商与区域选型，产出评估维度、候选对比矩阵、推荐结论与理由、迁移与容灾建议，并用JSON结构化保存以便后续自动筛选和审计。 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "requirements",
+        "candidates",
+        "scoring_model",
+        "jq_filters",
+        "decision_summary",
+        "dr_drill_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_039_9375cab1",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c67bdacc90",
+      "title": "Audit Python scientific toolkit CLI docs and examples for stale option references",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_039_9375cab1",
+        "source_task_id": "searchagent-search_seed_c67bdacc90",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Audit Python scientific toolkit CLI docs and examples for stale option references",
+        "subdomain": "scientific-python-maintenance",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "repository_text_files",
+            "source_name": "repository text files",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: repository text files"
+          },
+          {
+            "artifact": "readme_excerpts",
+            "source_name": "README excerpts",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: README excerpts"
+          },
+          {
+            "artifact": "python_example_scripts",
+            "source_name": "Python example scripts",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: Python example scripts"
+          },
+          {
+            "artifact": "cli_help_fixture",
+            "source_name": "CLI help fixture",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: CLI help fixture"
+          },
+          {
+            "artifact": "short_audit_report",
+            "source_name": "short audit report",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: short audit report"
+          }
+        ],
+        "failure_modes": [
+          "Only searches Python files and misses Markdown or fixture text.",
+          "Blindly recommends replacing every occurrence, including historical changelog entries.",
+          "Does not provide reproducible search commands or evidence snippets.",
+          "Confuses similarly named options such as --output-format with --output-dir."
+        ],
+        "validation_metric": "Report identifies at least 90% of seeded stale option occurrences, includes file paths and line-level evidence, and correctly marks intentional legacy references as non-actionable.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Given a small Python/scientific toolkit-style repository with command-line help text, README snippets, example scripts, and test fixtures, identify stale or inconsistent CLI option references after a recent rename such as --output-dir to --outdir. Produce a concise remediation report listing affected files, mismatched spellings, likely user impact, and a minimal patch plan. The task should require searching repository text and summarizing evidence, not implementing the full fix. 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "repository_text_files",
+        "readme_excerpts",
+        "python_example_scripts",
+        "cli_help_fixture",
+        "short_audit_report"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_040_add13632",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c369b67913",
+      "title": "Lint sample numerical toolkit release helper shell scripts before publishing wheels",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_040_add13632",
+        "source_task_id": "searchagent-search_seed_c369b67913",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Lint sample numerical toolkit release helper shell scripts before publishing wheels",
+        "subdomain": "python-packaging-release-engineering",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "bash_release_scripts",
+            "source_name": "bash release scripts",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: bash release scripts"
+          },
+          {
+            "artifact": "packaging_helper_scripts",
+            "source_name": "packaging helper scripts",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: packaging helper scripts"
+          },
+          {
+            "artifact": "shellcheck_diagnostic_output",
+            "source_name": "ShellCheck diagnostic output",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ShellCheck diagnostic output"
+          },
+          {
+            "artifact": "release_readiness_note",
+            "source_name": "release-readiness note",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: release-readiness note"
+          }
+        ],
+        "failure_modes": [
+          "Treats all ShellCheck warnings as equally critical without release context.",
+          "Ignores scripts without executable bits or nested under tools/ci.",
+          "Suggests broad rewrites that alter packaging semantics.",
+          "Suppresses diagnostics instead of explaining or fixing them."
+        ],
+        "validation_metric": "All provided shell scripts are linted, every seeded high-impact ShellCheck diagnostic is mentioned with its SC code, affected file, risk explanation, and minimal corrective recommendation.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: Given several shell scripts used to clean build artifacts, create wheels, and upload dry-run packages for a Python scientific toolkit project, run static analysis and prepare a release-readiness note. The note should group ShellCheck findings by severity, explain the likely runtime risk for each script, and propose safe minimal edits without changing release behavior. 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "bash_release_scripts",
+        "packaging_helper_scripts",
+        "shellcheck_diagnostic_output",
+        "release_readiness_note"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_041_80c3a10d",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c542c873a0",
+      "title": "sample numerical toolkit boundary-condition plugin lint hardening",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_041_80c3a10d",
+        "source_task_id": "searchagent-search_seed_c542c873a0",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit boundary-condition plugin lint hardening",
+        "subdomain": "scientific-computing/python-diversity_harness-quality",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "synthetic_python_package",
+            "source_name": "synthetic_python_package.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: synthetic_python_package.md"
+          },
+          {
+            "artifact": "pylint_findings",
+            "source_name": "pylint_findings.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: pylint_findings.md"
+          },
+          {
+            "artifact": "remediation_checklist",
+            "source_name": "remediation_checklist.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: remediation_checklist.md"
+          },
+          {
+            "artifact": "validation_report",
+            "source_name": "validation_report.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_report.md"
+          }
+        ],
+        "failure_modes": [
+          "ignores pylint output",
+          "treats all lint messages as equal",
+          "misses mutable default or config parsing risk",
+          "recommends unrelated rewrites",
+          "produces prose without an actionable fix checklist"
+        ],
+        "validation_metric": "At least 80% of seeded high-impact pylint issues are identified and mapped to concrete remediation steps, with no more than two unsupported claims about runtime behavior.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: A small research engineering team is preparing a sample numerical toolkit boundary-condition plugin for internal release. They need an agent to inspect a generated workspace artifact, identify maintainability and correctness risks using static analysis, and produce a concise remediation plan before the code is shared with modelers. 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "synthetic_python_package",
+        "pylint_findings",
+        "remediation_checklist",
+        "validation_report"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_042_29bf918e",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_44a9d200c7",
+      "title": "generic diversity harness native kernel patch review for numerical safety",
+      "selected_tools": [
+        "cppcheck",
+        "diffstat"
+      ],
+      "materials": {
+        "task_id": "tool_seed_042_29bf918e",
+        "source_task_id": "searchagent-search_seed_44a9d200c7",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "generic diversity harness native kernel patch review for numerical safety",
+        "subdomain": "scientific-computing/diversity_harness-native-extension-review",
+        "selected_tools": [
+          "cppcheck",
+          "diffstat"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "native_patch_snapshot",
+            "source_name": "native_patch_snapshot.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: native_patch_snapshot.md"
+          },
+          {
+            "artifact": "cppcheck_findings",
+            "source_name": "cppcheck_findings.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: cppcheck_findings.md"
+          },
+          {
+            "artifact": "diffstat_scope_summary",
+            "source_name": "diffstat_scope_summary.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: diffstat_scope_summary.md"
+          },
+          {
+            "artifact": "merge_recommendation",
+            "source_name": "merge_recommendation.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: merge_recommendation.md"
+          }
+        ],
+        "failure_modes": [
+          "summarizes diff without static-analysis evidence",
+          "ignores cppcheck diagnostics",
+          "approves memory or indexing defects",
+          "over-focuses on formatting",
+          "fabricates coverage or performance claims"
+        ],
+        "validation_metric": "Correctly identifies all seeded blocker-class native-code defects and provides a merge/no-merge recommendation justified by cppcheck findings plus diffstat-based scope assessment.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: A team migrating performance-critical shoreline update routines into a native extension needs a pre-merge review seed. The agent should inspect a synthetic patch, use static analysis and patch-size evidence, and decide whether the change is safe to merge, needs fixes, or should be rolled back. 候选工具: cppcheck, diffstat. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "native_patch_snapshot",
+        "cppcheck_findings",
+        "diffstat_scope_summary",
+        "merge_recommendation"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 4,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_043_152c7903",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_0c570e36dd",
+      "title": "sample numerical toolkit: gcovr coverage gate for numerical claw solver refactor",
+      "selected_tools": [
+        "gcovr"
+      ],
+      "materials": {
+        "task_id": "tool_seed_043_152c7903",
+        "source_task_id": "searchagent-search_seed_0c570e36dd",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: gcovr coverage gate for numerical claw solver refactor",
+        "subdomain": "scientific-computing-test-coverage",
+        "selected_tools": [
+          "gcovr"
+        ],
+        "source_evidence_ids": [
+          "web_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "coverage_command_transcript",
+            "source_name": "coverage command transcript",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: coverage command transcript"
+          },
+          {
+            "artifact": "html_or_text_summary",
+            "source_name": "gcovr XML/HTML or text summary",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: gcovr XML/HTML or text summary"
+          },
+          {
+            "artifact": "short_coverage_gap_memo",
+            "source_name": "short coverage-gap memo",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: short coverage-gap memo"
+          },
+          {
+            "artifact": "test_target_checklist",
+            "source_name": "test-target checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: test-target checklist"
+          },
+          {
+            "artifact": "validation_notes",
+            "source_name": "validation notes",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation notes"
+          }
+        ],
+        "failure_modes": [
+          "Inventing coverage percentages without running gcovr",
+          "Treating numerical correctness as proven solely by high coverage",
+          "Ignoring generated/cache files in coverage scope",
+          "Producing only prose with no reproducible command plan",
+          "Using tools outside the selected gcovr group"
+        ],
+        "validation_metric": "gcovr run is reproducible and the seed defines a concrete minimum coverage gate plus at least three solver-specific uncovered-risk areas.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: The maintainer needs a reproducible seed task where an agent improves confidence in a Python numerical solver refactor by creating a compact test/coverage workflow, running gcovr, identifying untested boundary-condition and Riemann-solver paths, and producing workspace artifacts that explain the coverage gap and proposed test targets without relying on external project history. 候选工具: gcovr. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "coverage_command_transcript",
+        "html_or_text_summary",
+        "short_coverage_gap_memo",
+        "test_target_checklist",
+        "validation_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_044_eb5322e0",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_a0439bb0ef",
+      "title": "sample numerical toolkit: nginx plus ab benchmark harness for solver results API",
+      "selected_tools": [
+        "apache2-utils",
+        "nginx"
+      ],
+      "materials": {
+        "task_id": "tool_seed_044_eb5322e0",
+        "source_task_id": "searchagent-search_seed_a0439bb0ef",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "sample numerical toolkit: nginx plus ab benchmark harness for solver results API",
+        "subdomain": "python-service-performance-benchmarking",
+        "selected_tools": [
+          "apache2-utils",
+          "nginx"
+        ],
+        "source_evidence_ids": [
+          "web_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "nginx_server_block_snippet",
+            "source_name": "nginx server block snippet",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: nginx server block snippet"
+          },
+          {
+            "artifact": "ab_benchmark_command_log",
+            "source_name": "ab benchmark command log",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: ab benchmark command log"
+          },
+          {
+            "artifact": "performance_comparison_table",
+            "source_name": "performance comparison table",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: performance comparison table"
+          },
+          {
+            "artifact": "tuning_rationale_memo",
+            "source_name": "tuning rationale memo",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: tuning rationale memo"
+          },
+          {
+            "artifact": "rollback_checklist",
+            "source_name": "rollback checklist",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback checklist"
+          }
+        ],
+        "failure_modes": [
+          "Benchmarking without a running nginx path",
+          "Reporting only average latency while omitting failed requests or non-2xx responses",
+          "Confusing application solver optimization with HTTP proxy tuning",
+          "Using production-like sensitive logs or real customer data",
+          "Selecting tools beyond nginx and apache2-utils"
+        ],
+        "validation_metric": "ab output includes request count, concurrency, requests/sec, failed requests, and latency percentiles or equivalent timing summary for both baseline and tuned nginx configurations.",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: The engineer needs a seed task where an agent designs and exercises a local nginx reverse-proxy benchmark for a Python service endpoint that returns small simulation metadata/results, using apache2-utils ab to compare baseline and tuned nginx settings, then documenting latency, throughput, error rate, and safe rollback guidance. 候选工具: apache2-utils, nginx. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "nginx_server_block_snippet",
+        "ab_benchmark_command_log",
+        "performance_comparison_table",
+        "tuning_rationale_memo",
+        "rollback_checklist"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_045_4e6c51d9",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_25fde5805d",
+      "title": "YAML化微服务迁移计划种子",
+      "selected_tools": [
+        "node-js-yaml"
+      ],
+      "materials": {
+        "task_id": "tool_seed_045_4e6c51d9",
+        "source_task_id": "searchagent-search_seed_25fde5805d",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "YAML化微服务迁移计划种子",
+        "subdomain": "编码开发/单体到微服务迁移",
+        "selected_tools": [
+          "node-js-yaml"
+        ],
+        "source_evidence_ids": [
+          "anysearch_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "migration_plan",
+            "source_name": "migration_plan.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: migration_plan.yaml"
+          },
+          {
+            "artifact": "milestones",
+            "source_name": "milestones.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: milestones.yaml"
+          },
+          {
+            "artifact": "risk_register",
+            "source_name": "risk_register.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_register.yaml"
+          },
+          {
+            "artifact": "rollback_decisions",
+            "source_name": "rollback_decisions.yaml",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rollback_decisions.yaml"
+          },
+          {
+            "artifact": "readme_validation_notes",
+            "source_name": "README_validation_notes.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: README_validation_notes.md"
+          }
+        ],
+        "failure_modes": [
+          "输出散文而非结构化YAML",
+          "忽略可停机窗口导致迁移步骤不可执行",
+          "风险清单没有触发条件或缓解动作",
+          "生成需要真实系统文件的任务"
+        ],
+        "validation_metric": "node-js-yaml成功解析全部yaml文件，且必需字段coverage达到100%：phases,milestones,dependencies,risks,rollback,decision_points",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 仅输入现有系统规模、团队规模、时间窗口、可停机窗口，生成单体到微服务迁移计划，并把阶段、里程碑、依赖、风险、回退点和决策点落成结构化YAML工件。 候选工具: node-js-yaml. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "migration_plan",
+        "milestones",
+        "risk_register",
+        "rollback_decisions",
+        "readme_validation_notes"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_046_e0eebe21",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_8c4a6df5cc",
+      "title": "SQLite年度安全审计计划台账种子",
+      "selected_tools": [
+        "sqlite3"
+      ],
+      "materials": {
+        "task_id": "tool_seed_046_e0eebe21",
+        "source_task_id": "searchagent-search_seed_8c4a6df5cc",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "SQLite年度安全审计计划台账种子",
+        "subdomain": "IT与安全/年度安全审计",
+        "selected_tools": [
+          "sqlite3"
+        ],
+        "source_evidence_ids": [
+          "anysearch_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "audit_plan",
+            "source_name": "audit_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: audit_plan.md"
+          },
+          {
+            "artifact": "schema",
+            "source_name": "schema.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: schema.sql"
+          },
+          {
+            "artifact": "seed_data",
+            "source_name": "seed_data.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: seed_data.sql"
+          },
+          {
+            "artifact": "validation_queries",
+            "source_name": "validation_queries.sql",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: validation_queries.sql"
+          },
+          {
+            "artifact": "risk_and_dependency_register",
+            "source_name": "risk_and_dependency_register.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: risk_and_dependency_register.md"
+          }
+        ],
+        "failure_modes": [
+          "只写模板不提供可执行SQL",
+          "SQL无法在sqlite3中运行",
+          "审计任务与合规要求没有映射关系",
+          "缺少变更应对或关键决策点"
+        ],
+        "validation_metric": "sqlite3批量执行SQL零错误；validation_queries返回覆盖统计，关键实体非空且关键任务审计覆盖率>=95%",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 仅输入审计范围、团队规模、时间窗口、合规要求，生成年度安全审计计划，并用SQLite建模审计任务、里程碑、依赖、风险、决策点和状态查询。 候选工具: sqlite3. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "audit_plan",
+        "schema",
+        "seed_data",
+        "validation_queries",
+        "risk_and_dependency_register"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_047_dcf8c246",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_935189a281",
+      "title": "RBAC权限模型设计包：用jq校验接口与数据模型JSON一致性",
+      "selected_tools": [
+        "jq"
+      ],
+      "materials": {
+        "task_id": "tool_seed_047_dcf8c246",
+        "source_task_id": "searchagent-search_seed_935189a281",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "RBAC权限模型设计包：用jq校验接口与数据模型JSON一致性",
+        "subdomain": "IT与安全/RBAC权限模型",
+        "selected_tools": [
+          "jq"
+        ],
+        "source_evidence_ids": [
+          "anysearch_003"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "design",
+            "source_name": "design.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: design.md"
+          },
+          {
+            "artifact": "api_schema",
+            "source_name": "api_schema.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: api_schema.json"
+          },
+          {
+            "artifact": "data_model",
+            "source_name": "data_model.json",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: data_model.json"
+          },
+          {
+            "artifact": "edge_cases",
+            "source_name": "edge_cases.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: edge_cases.md"
+          },
+          {
+            "artifact": "test_plan",
+            "source_name": "test_plan.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: test_plan.md"
+          }
+        ],
+        "failure_modes": [
+          "只给通用RBAC概念，没有落到接口和数据结构",
+          "忽略多租户隔离或审计要求",
+          "JSON artifact不可被jq解析",
+          "没有边界条件和失败处理",
+          "把任务写成代码实现而非设计包"
+        ],
+        "validation_metric": "所有JSON文件jq解析通过；设计包至少覆盖5类核心实体、4类异常场景、6条测试用例。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于角色复杂度、用户规模、多租户要求、审计要求，产出RBAC权限模型设计：权限模型文档、接口定义、数据模型、边界与异常处理、测试要点；禁止依赖历史文件、真实客户数据或现有代码库。 候选工具: jq. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "design",
+        "api_schema",
+        "data_model",
+        "edge_cases",
+        "test_plan"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_048_977f3651",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_f4f97d0f5f",
+      "title": "限流组件设计包：用ripgrep+mawk检查文档覆盖与测试矩阵",
+      "selected_tools": [
+        "ripgrep",
+        "mawk"
+      ],
+      "materials": {
+        "task_id": "tool_seed_048_977f3651",
+        "source_task_id": "searchagent-search_seed_f4f97d0f5f",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "限流组件设计包：用ripgrep+mawk检查文档覆盖与测试矩阵",
+        "subdomain": "编码开发/限流组件",
+        "selected_tools": [
+          "ripgrep",
+          "mawk"
+        ],
+        "source_evidence_ids": [
+          "anysearch_004"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "rate_limiter_design",
+            "source_name": "rate_limiter_design.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: rate_limiter_design.md"
+          },
+          {
+            "artifact": "interfaces",
+            "source_name": "interfaces.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: interfaces.md"
+          },
+          {
+            "artifact": "data_model",
+            "source_name": "data_model.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: data_model.md"
+          },
+          {
+            "artifact": "failure_handling",
+            "source_name": "failure_handling.md",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: failure_handling.md"
+          },
+          {
+            "artifact": "test_matrix",
+            "source_name": "test_matrix.tsv",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: test_matrix.tsv"
+          }
+        ],
+        "failure_modes": [
+          "只描述单机限流，忽略分布式部署",
+          "没有说明算法取舍和性能影响",
+          "测试矩阵缺列或用例过少",
+          "未覆盖时钟漂移、缓存/存储故障、热点key、配置变更竞态",
+          "产物散乱，无法被命令行工具快速核查"
+        ],
+        "validation_metric": "ripgrep命中核心限流术语不少于8项；test_matrix.tsv经mawk检查至少4列且不少于10条测试用例。",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于限流维度、流量规模、部署形态、性能要求，产出限流组件设计：设计文档、接口与数据模型、边界与失败处理、测试要点；仅使用口头需求和合成约束，不使用日志、PR diff或现有代码库。 候选工具: ripgrep, mawk. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "rate_limiter_design",
+        "interfaces",
+        "data_model",
+        "failure_handling",
+        "test_matrix"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 5,
+        "failure_modes": 5,
+        "seed_metadata": 3,
+        "selected_tools": 2,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_049_d91d56fe",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_c1a5317c04",
+      "title": "Python service RBAC policy skeleton lint-hardening",
+      "selected_tools": [
+        "pylint"
+      ],
+      "materials": {
+        "task_id": "tool_seed_049_d91d56fe",
+        "source_task_id": "searchagent-search_seed_c1a5317c04",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Python service RBAC policy skeleton lint-hardening",
+        "subdomain": "IT与安全/RBAC 权限模型/Python 后端设计",
+        "selected_tools": [
+          "pylint"
+        ],
+        "source_evidence_ids": [
+          "web_001"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "artifact_1",
+            "source_name": "需求约束摘要",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 需求约束摘要"
+          },
+          {
+            "artifact": "python",
+            "source_name": "Python 模块草稿",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: Python 模块草稿"
+          },
+          {
+            "artifact": "artifact_3",
+            "source_name": "接口与数据模型说明",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 接口与数据模型说明"
+          },
+          {
+            "artifact": "artifact_4",
+            "source_name": "边界/异常清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 边界/异常清单"
+          },
+          {
+            "artifact": "pylint",
+            "source_name": "pylint 报告与修复记录",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: pylint 报告与修复记录"
+          },
+          {
+            "artifact": "artifact_6",
+            "source_name": "测试要点清单",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 测试要点清单"
+          }
+        ],
+        "failure_modes": [
+          "只写通用权限管理建议，没有 Python 数据模型或接口",
+          "忽略租户边界导致跨租户授权风险",
+          "为了通过 pylint 删除关键逻辑或审计字段",
+          "未说明 deny 优先、角色冲突、用户离职/禁用等异常场景"
+        ],
+        "validation_metric": "pylint score >= 8.5/10 and evaluator checklist covers >= 90% of required RBAC design points",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于角色复杂度、用户规模、多租户要求和审计要求，产出 RBAC 权限模型的 Python 设计骨架：包含 Role/Permission/Assignment 数据模型、allow/deny 判定接口、租户隔离边界、审计事件结构、异常处理与测试要点；同时修复随附 Python 文件中的 lint 问题，使其通过 pylint 门槛。 候选工具: pylint. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "artifact_1",
+        "python",
+        "artifact_3",
+        "artifact_4",
+        "pylint",
+        "artifact_6"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    },
+    {
+      "task_id": "tool_seed_050_bcd86685",
+      "difficulty": "medium",
+      "source_task_id": "searchagent-search_seed_f20ec35a8d",
+      "title": "Offline sync helper scripts and Python conflict planner",
+      "selected_tools": [
+        "shellcheck"
+      ],
+      "materials": {
+        "task_id": "tool_seed_050_bcd86685",
+        "source_task_id": "searchagent-search_seed_f20ec35a8d",
+        "source": "searchAgent -> generic diversity seed -> deterministic batch finalizer",
+        "title": "Offline sync helper scripts and Python conflict planner",
+        "subdomain": "产品与设计/移动端离线同步/弱网可靠性",
+        "selected_tools": [
+          "shellcheck"
+        ],
+        "source_evidence_ids": [
+          "web_002"
+        ],
+        "privacy": "synthetic_only_no_private_data",
+        "artifact_requirements": [
+          {
+            "artifact": "artifact_1",
+            "source_name": "同步方案设计文档",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 同步方案设计文档"
+          },
+          {
+            "artifact": "artifact_2",
+            "source_name": "状态机与接口草图",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 状态机与接口草图"
+          },
+          {
+            "artifact": "python",
+            "source_name": "Python 冲突规划器原型说明",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: Python 冲突规划器原型说明"
+          },
+          {
+            "artifact": "shell",
+            "source_name": "shell 校验脚本",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shell 校验脚本"
+          },
+          {
+            "artifact": "shellcheck",
+            "source_name": "shellcheck 诊断与修复记录",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: shellcheck 诊断与修复记录"
+          },
+          {
+            "artifact": "artifact_6",
+            "source_name": "边界与弱网测试矩阵",
+            "description": "Required artifact derived from searchAgent/generic diversity seed: 边界与弱网测试矩阵"
+          }
+        ],
+        "failure_modes": [
+          "只给移动端产品建议，没有接口、状态机或测试矩阵",
+          "shell 脚本存在未引用变量、错误 glob、忽略命令失败等问题",
+          "冲突处理过度简化，未说明幂等键、版本号或合并策略",
+          "未区分强一致数据与可最终一致数据"
+        ],
+        "validation_metric": "shellcheck exits 0 for provided scripts and design checklist covers offline, retry, idempotency, conflict, and observability scenarios",
+        "real_demand_excerpt": "基于 searchAgent seed 构建 Toolize/ALE 对齐任务候选包。真实需求: 基于数据类型、用户规模、冲突容忍度和弱网比例，设计移动端离线同步方案：包含同步状态机、增量拉取/推送接口、冲突解决策略、重试与幂等机制、边界测试；同时提供 Python 冲突规划器原型和 shell 校验脚本，并用静态检查工具发现和修复明显问题。 候选工具: shellcheck. 必须通过工具调用生成 workspace_seed、candidate_task.json、evaluator_rubric.json 和 validation_report.md，并运行确定性验证命令。"
+      },
+      "prompt": "Use the SQLite database at {db_path} and the provided workspace materials. Create or update the project_sync_report table with columns artifact TEXT, status TEXT, evidence TEXT. It must include one ready row for every artifact listed in artifact_requirements. Also ensure the report_status table contains one row with status='ready'.",
+      "expected_artifacts": [
+        "artifact_1",
+        "artifact_2",
+        "python",
+        "shell",
+        "shellcheck",
+        "artifact_6"
+      ],
+      "expected_counts": {
+        "artifact_requirements": 6,
+        "failure_modes": 4,
+        "seed_metadata": 3,
+        "selected_tools": 1,
+        "validation_checks": 5
+      }
+    }
+  ]
+}

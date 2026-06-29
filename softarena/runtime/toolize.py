@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import mimetypes
+import shutil
 import sqlite3
 import subprocess
 import tarfile
@@ -102,6 +103,14 @@ class LocalToolizeRuntime:
 
     def _file_identify(self, arguments: dict[str, Any]) -> ToolObservation:
         path = Path(arguments["path"])
+        if not shutil.which("file"):
+            guessed = mimetypes.guess_type(path.name)[0]
+            try:
+                text = path.read_text(errors="strict")
+                file_type = "ASCII text" if text.isascii() else "Unicode text"
+            except UnicodeDecodeError:
+                file_type = guessed or "application/octet-stream"
+            return ToolObservation(ok=True, content={"file_type": file_type}, stdout=file_type + "\n")
         result = subprocess.run(["file", "-b", str(path)], text=True, capture_output=True, check=False)
         file_type = result.stdout.strip() or mimetypes.guess_type(path.name)[0] or "unknown"
         return ToolObservation(ok=result.returncode == 0, content={"file_type": file_type}, stdout=result.stdout, stderr=result.stderr, returncode=result.returncode)

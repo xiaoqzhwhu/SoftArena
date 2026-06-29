@@ -1,0 +1,10 @@
+{
+  "job_id": "computing_math_project_sync_sqlite_smoke_v0",
+  "env_id": "computing_math.project_sync_sqlite.v0",
+  "split": "smoke",
+  "model": "scripted_project_sync_sqlite-v0",
+  "policy": "scripted_project_sync_sqlite",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

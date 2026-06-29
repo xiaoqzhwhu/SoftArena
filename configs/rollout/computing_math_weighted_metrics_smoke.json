@@ -1,0 +1,10 @@
+{
+  "job_id": "computing_math_weighted_metrics_smoke_v0",
+  "env_id": "computing_math.weighted_metrics.v0",
+  "split": "smoke",
+  "model": "scripted_weighted_metrics-v0",
+  "policy": "scripted_weighted_metrics",
+  "seed_start": 0,
+  "max_tasks": null,
+  "output_dir": "runs/rollouts"
+}

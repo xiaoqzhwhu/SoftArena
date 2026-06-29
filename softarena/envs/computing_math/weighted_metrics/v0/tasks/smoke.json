@@ -1,0 +1,54 @@
+{
+  "tasks": [
+    {
+      "task_id": "weighted_metrics_smoke_001",
+      "difficulty": "easy",
+      "prompt": "You are given a SQLite database at {db_path}. The observations table has segment, value, weight, and include_flag columns. Create a table named segment_metrics with columns segment TEXT, weighted_mean REAL, and n INTEGER. Use only rows where include_flag = 1. For each segment, weighted_mean is ROUND(SUM(value * weight) / SUM(weight), 4), and n is the number of included rows.",
+      "observations": [
+        ["alpha", 10.0, 1.0, 1],
+        ["alpha", 14.0, 3.0, 1],
+        ["alpha", 100.0, 1.0, 0],
+        ["beta", 5.0, 2.0, 1],
+        ["beta", 9.0, 2.0, 1]
+      ],
+      "expected_rows": [
+        {"segment": "alpha", "weighted_mean": 13.0, "n": 2},
+        {"segment": "beta", "weighted_mean": 7.0, "n": 2}
+      ]
+    },
+    {
+      "task_id": "weighted_metrics_smoke_002",
+      "difficulty": "easy",
+      "prompt": "In the SQLite database at {db_path}, compute deterministic weighted summary metrics. Create segment_metrics(segment, weighted_mean, n) from observations using only include_flag = 1 and ROUND(SUM(value * weight) / SUM(weight), 4).",
+      "observations": [
+        ["control", 2.5, 1.0, 1],
+        ["control", 3.5, 1.0, 1],
+        ["treatment", 8.0, 1.0, 1],
+        ["treatment", 10.0, 3.0, 1],
+        ["treatment", 0.0, 5.0, 0]
+      ],
+      "expected_rows": [
+        {"segment": "control", "weighted_mean": 3.0, "n": 2},
+        {"segment": "treatment", "weighted_mean": 9.5, "n": 2}
+      ]
+    },
+    {
+      "task_id": "weighted_metrics_smoke_003",
+      "difficulty": "medium",
+      "prompt": "Use the SQLite database at {db_path}. Produce segment_metrics with one row per segment, excluding include_flag = 0 rows. The weighted_mean must be rounded to 4 decimal places and n must count included observations.",
+      "observations": [
+        ["east", 1.0, 0.5, 1],
+        ["east", 2.0, 1.5, 1],
+        ["west", 4.0, 1.0, 1],
+        ["west", 10.0, 2.0, 1],
+        ["west", 99.0, 1.0, 0],
+        ["north", 7.0, 1.0, 1]
+      ],
+      "expected_rows": [
+        {"segment": "east", "weighted_mean": 1.75, "n": 2},
+        {"segment": "north", "weighted_mean": 7.0, "n": 1},
+        {"segment": "west", "weighted_mean": 8.0, "n": 2}
+      ]
+    }
+  ]
+}
